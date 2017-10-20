@@ -1,0 +1,49 @@
+body {
+	color: #272727;
+	font-family: 'Source Sans Pro', sans-serif;
+	/*background-color: #ececec;*/
+}
+
+h1 {
+	text-align: left;
+	font-size : 80px;
+	padding-left: 4%;
+	font-family: 'Encode Sans Expanded', sans-serif;
+}
+
+h1 small {
+	font-size: 40px;
+	font-family: 'Source Sans Pro', sans-serif;
+}
+
+form {
+	width: 50%;
+	margin-left: 50%;
+}
+
+input {
+	display: inline-block;
+	width: 50%;
+	line-height: 20px;
+	margin: 5px;
+}
+
+label {
+	display: inline-block;
+	width: 25%;
+}
+
+.orange {
+	color: #FF852C;
+}
+
+.canvas {
+	margin-left: 5%;
+	margin-right: 5%;
+}
+
+.sideFormula {
+	padding: 10px;
+	display: inline-grid;
+	width: 45%;
+}
