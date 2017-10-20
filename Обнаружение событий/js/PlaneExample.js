@@ -3,8 +3,7 @@ var ctx;
 var cvWidth;
 var cvHeight;
 
-var everyObject = [];
-var planeObject = [0,0];
+var Ball = [0,0];
 
 window.stopDemo=function()
 {
@@ -21,12 +20,10 @@ window.startDemo=function() {
     var a  = parseFloat(document.getElementById('A').value);
     var VB = parseFloat(document.getElementById('Vb').value);
     var v0 = [VB*Math.cos(a*0.0174533), VB*Math.sin(a*0.0174533)];
-    
-    var vPlane =  parseFloat(document.getElementById('Va').value);
-    var hPlane =  parseFloat(document.getElementById('H').value);
-    var sPlane =  parseFloat(document.getElementById('S').value);
-    var xPlane = 0;
-    planeObject = [xPlane, hPlane];
+    var yBall =  parseFloat(document.getElementById('H').value);
+    var xBall = 0;
+
+    Ball = [xBall, yBall];
 
     cv = document.getElementById('myCanvas');
     ctx = cv.getContext('2d');
@@ -34,39 +31,42 @@ window.startDemo=function() {
     cvHeight = cv.height;
 
     animate();
+    var beenOver = true;
 
     window.interval = setInterval(function() {
       
-      // console.log(xPlane + "  --  " + vPlane);
-      var statePlane = rk4(xPlane, vPlane, (function(x, v, dt) {
-        return 0;
-      }), window.dt);
-
-      xPlane = statePlane[0];
-      planeObject = [xPlane, hPlane];
-
-      if (xPlane > sPlane)
-      {
-        var stateX = rk4(x0, v0[0], (function(x, v, dt) {
+        var newXBall = rk4(xBall, v0[0], (function(x, v, dt) {
           return 0;
         }), window.dt);
 
-        var stateY = rk4(y0, v0[1], (function(x, v, dt) {
+        var newYBall = rk4(yBall, v0[1], (function(x, v, dt) {
           return -9.8;
         }), window.dt);
 
-        x0 = stateX[0];
-        y0 = stateY[0];
-        v0 = [stateX[1], stateY[1]];
+        xBall = newXBall[0];
+        v0[0] = newXBall[1];
+        yBall = newYBall[0];
+        v0[1] = newYBall[1];
 
-        everyObject.push([x0, y0, 5, 5, 'black']);
-      }
+        if (yBall < 0 && beenOver)
+        {
+          beenOver = false;
+          v0[1] = -v0[1]*0.6;
+          console.log(v0[1])
+        }
+        else if (yBall > 0)
+        {
+          beenOver = true;
+        }
 
-      if (Math.round(y0) < 0)
-      {
-        clearInterval(window.interval);
-        alert("Donezo");
-      } 
+
+        Ball = [xBall, yBall];
+
+        if (Math.round(y0) < 0)
+        {
+          clearInterval(window.interval);
+          alert("Donezo");
+        } 
 
     }, window.dt*1000);
 }
@@ -77,29 +77,12 @@ function animate() {
   ctx.clearRect(0, 0, cvWidth, cvHeight);
 
   ctx.fillStyle = 'black';
-  ctx.moveTo(0,cvHeight-0);
-  ctx.lineTo(cvWidth,cvHeight-0);
+  ctx.moveTo(0,cvHeight-20);
+  ctx.lineTo(cvWidth,cvHeight-20);
   ctx.stroke();
 
   ctx.beginPath();
-  ctx.arc(planeObject[0],cvHeight-planeObject[1],5,0,2*Math.PI);
+  ctx.arc(Ball[0],cvHeight-20-Ball[1],5,0,2*Math.PI);
   ctx.fill();
-
-  var step;
-  for (step = 0; step < everyObject.length - 1; step++) {
-    var o = everyObject[step];
-    ctx.beginPath();
-    ctx.arc(o[0], cvHeight-o[1],1,0,2*Math.PI);
-    ctx.fill();
-  }
-
-  if (everyObject.length > 1)
-  {
-    var o = everyObject[everyObject.length - 1];
-    ctx.fillStyle = 'red';
-    ctx.beginPath();
-    ctx.arc(o[0], cvHeight-o[1],3,0,2*Math.PI);
-    ctx.fill();
-  }
 
 }

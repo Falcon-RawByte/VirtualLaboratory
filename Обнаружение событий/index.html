@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Mathcore.js - Example!</title>
+	<title>Обнаружение событий - прыгающий мячик</title>
 
 	<link href="https://fonts.googleapis.com/css?family=Encode+Sans+Expanded|Source+Sans+Pro" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
@@ -15,51 +15,26 @@
 </head>
 
 <body>
-	<h1>Обнаружение событий.<span class="orange">js</span><small> - НГТУ 2017</small> </h1>
-
-	<div class="canvas">
-
-		<div class="sideFormula">
-			<p>Самолёт летит горизонтально на высоте <span class="ms">H</span> с постоянной скоростью <span class="ms">V<sub>airplane</sub></span>. Когда он достигает точки, удалённой от начала координат на расстояние S, начинает двигаться шар со скоростью <span class="ms">V<sub>ball</sub></span> под углом <span class="ms">&alpha;</span></p>
-			<p>Найдите, когда самолёт и шар столкнуться, используя соотношения</p>
-		</div>
-
-		<div class="sideFormula">
-		<div class="math">
-				<p>X<sub>airplane</sub> = X<sub>ball</sub></p>
-				<p>Y<sub>airplane</sub> = Y<sub>ball</sub></p>
-				<p>Y<sub>airplane</sub> = H</p>
-				<p>X<sub>airplane</sub> = V<sub>airplane</sub> &times; t<sub>collision</sub></p>
-				<p>X<sub>ball</sub> = V<sub>ball</sub> &times; sin(&alpha;) &times; t<sub>collision</sub></p>
-				<p>Y<sub>ball</sub> = V<sub>ball</sub> &times; cos(&alpha;) &times; t<sub>collision</sub> - 
-			<span class="frac">
-    			<span>gt<sup>2</sup></span>
-    			<span class="symbol">/</span>
-    			<span class="bottom">2</span>
-			</span>
-			.</p>
-		</div>
-		</div>
-	</div>
+	<h1>Обнаружение событий.<span class="orange">js</span><small> - прыгающий мячик</small> </h1>
 
 	<form>
 		<label>Шаг итерации (в мс)</label>
 		<input type="number" id="dt" step="10" value="50">
 
 		<label>H (в метрах)</label>
-		<input type="number" id="H" step="10" value="100">
+		<input type="number" id="H" step="10" value="200">
 
 		<label>S (в метрах)</label>
 		<input type="number" id="S" step="10" value="100">
 
 		<label>V<sub>ball</sub> (в м/с)</label>
-		<input type="number" id="Vb" step="10" value="90">
+		<input type="number" id="Vb" step="10" value="30">
 
 		<label>V<sub>airplane</sub> (в м/с)</label>
 		<input type="number" id="Va" step="10" value="50">
 
 		<label>&alpha; (в градусах)</label>
-		<input type="number" id="A" step="0.01" value="50">
+		<input type="number" id="A" step="0.01" value="0">
 	</form>
 
 	<p><a href="javascript:window.startDemo()">Start Demo</a></p>
