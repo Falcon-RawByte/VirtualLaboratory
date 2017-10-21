@@ -1,0 +1,55 @@
+
+
+
+.table_label
+{
+display:table-cell;
+text-align:right;
+}
+
+.table_input
+{
+	display:table-cell;
+	margin-left:10px;
+}
+.table_row
+{
+	display:table-row;
+	margin-top:2px;
+	margin-bottom:2px;
+}
+.table_row_spacer
+{
+	height:5px;
+}
+.methodEditor
+{
+
+
+
+	display: inline-block;
+	border: 1px solid black;
+	padding: 5px;
+	margin: 5px;
+}
+
+#addMethodButton
+{
+	display:block;
+	margin:auto;
+}
+.removeMethodButton
+{
+	display:block;
+	margin:auto;
+}
+#methodCollection
+{
+
+
+	
+	border: 1px solid black;
+	padding: 10px;
+	margin: 5px;
+	overflow-y: auto;
+}
