@@ -1,0 +1,15 @@
+
+.grid_svg{
+	font:10px sans-serif;
+  shape-rendering: crispEdges;
+}
+.axis path
+{
+	fill:none;
+	stroke:none;
+}
+.axis line
+{
+	fill:none;
+	stroke:#000;
+}

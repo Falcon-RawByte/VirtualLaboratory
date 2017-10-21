@@ -4,12 +4,7 @@
 
 SemiImplicitEuler=(function()
 {
-	/*
-	the system has the following form(n - number of dimensions) 
-	
-
-	*/
-	function Step(x,v,t,delta,funcs,error)//funcs contains 2*dimensions number of elements (velocity + acceleration)
+	function Step(x,v,t,delta,funcs,error)//funcs:[velocity,acceleration]
 	{
 		/*
 		v(n+1)=v(n)+dt*g(x(n));
@@ -36,7 +31,7 @@ SemiImplicitEuler=(function()
 		vt=new Array(dimensions);
 		for(var i=0;i<dimensions;i++)
 		{
-			vt[i]=xv[i+dimensions]+delta*funcs(t,xv);
+			vt[i]=xv[i+dimensions]+delta*funcs(xv,t);
 		}
 		for(var i=0;i<dimensions;i++)
 		{
@@ -44,7 +39,7 @@ SemiImplicitEuler=(function()
 		}
 		for(var i=0;i<dimensions;i++)
 		{
-			xv[i]+=delta*funcs(t,xv);
+			xv[i]+=delta*funcs(xv,t);
 		}
 	}
 
@@ -66,6 +61,8 @@ StormerVerlet=(function()
 		delta_last=1;
 	}
 	function Step(xv,t,delta,funcs)//x(n+1)=2*x(n)-x(n-1)+A(xn)dt^2
+	//xv:[positions(count),velocities(count)]
+	//funcs:[x',x'']
 	{
 		if(step=0)
 		{
@@ -79,7 +76,7 @@ StormerVerlet=(function()
 		var k=new Array(count);
 		for(var i=0;i<count;i++)
 		{
-			k[i]=xv[i]+(xv[i]-xv_last[i])*delta/delta_last+funcs[i+count](t,xv)*delta*(delta+delta_last)*0.5;
+			k[i]=xv[i]+(xv[i]-xv_last[i])*delta/delta_last+funcs[i+count](xv,t)*delta*(delta+delta_last)*0.5;
 		}
 		xv_last=xv.splice();
 		for(var i=0;i<count;i++)
@@ -101,7 +98,7 @@ VelocityVerlet=(function()
 		var xv_half_t=new Array(xv.length);
 		for(var i=0;i<count;i++)
 		{
-			var temp=xv_half_t[i+count]=xv[i+count]+0.5*funcs[i+count](t,xv)*delta;
+			var temp=xv_half_t[i+count]=xv[i+count]+0.5*funcs[i+count](xv,t)*delta;
 			xv_half_t[i]=xv[i]+temp*delta;
 		}
 		for(var i=0;i<count;i++)
@@ -111,7 +108,7 @@ VelocityVerlet=(function()
 		var t_next=t+delta;
 		for(var i=0;i<count;i++)
 		{
-			xv[i+count]=xv_half_t[i+count]+0.5*funcs[i+count](t_next,xv)*delta;
+			xv[i+count]=xv_half_t[i+count]+0.5*funcs[i+count](xv,t_next)*delta;
 		}
 	}
 		function StepAlt(xv,t,delta,funcs)//x(n+1)=2*x(n)-x(n-1)+A(xn)dt^2
@@ -120,7 +117,7 @@ VelocityVerlet=(function()
 			var xa_temp=new Array(xv.length);
 			for(var i=0;i<count;i++)
 			{
-				xa_temp[i+count]=funcs[i+count](t,xv);//a(t)
+				xa_temp[i+count]=funcs[i+count](xv,t);//a(t)
 				xa_temp[i]=xv[i]+(xv[i+count]+0.5*xa_temp[i+count]*delta)*delta;//x(t+dt)
 			}
 			for(var i=0;i<count;i++)
@@ -130,7 +127,7 @@ VelocityVerlet=(function()
 			var t_next=t+delta;
 			for(var i=0;i<count;i++)
 			{
-				xa_temp[i]=xv[i+count]+0.5*(xa_temp[i+count]+funcs[i+count](t+delta,xv))*delta;//v(t+dt)=v(t)+0.5(a(t)+a(t+dt))*dt
+				xa_temp[i]=xv[i+count]+0.5*(xa_temp[i+count]+funcs[i+count](xv,t+delta))*delta;//v(t+dt)=v(t)+0.5(a(t)+a(t+dt))*dt
 			}
 			for(var i=0;i<count;i++)
 			{
@@ -139,10 +136,6 @@ VelocityVerlet=(function()
 		}
 
 		return {Step:Step};
-
-
-
-
 	})();
 
 
@@ -154,27 +147,30 @@ VelocityVerlet=(function()
 //general
 Ralston=(function()
 {
+
 	function Step(xv,t,delta,funcs)
 	{
 		var count=xv.length;
 		var k1=new Array(count);
 		var k2=new Array(count);
+		var ktemp=new Array(count);
 		for(var i=0;i<count;i++)
 		{
-			k1[i]=funcs[i](t,xv);
+			k1[i]=funcs[i](xv,t)*delta;
+			ktemp[i]=k1[i]*0.666667+xv[i];
 		}
 		var t_next=t+delta*0.666667;
 		for(var i=0;i<count;i++)
 		{
-				//k[i]=delta*0.5*(funcs[i](t,xv)+funcs[i](t_next,t));
-				k2[i]=(funcs[i](t_next,k1*delta*0.666667+xv[i])*h);
+				//k2 = h f(xi + 2 h / 3, yi + 2 k1 / 3 )
+				k2[i]=funcs[i](ktemp,t_next)*delta;
 			}
 			for(var i=0;i<count;i++)
 				xv[i]+=k1[i]*0.25+0.75*k2[i];
 		}
 		return {Step:Step};
 	})();
-Trapezoidal=(function()//y(i,n+1)=y(i,n)+dt/2*(f(t,y(n))+f(t+dt,y(n+1')))
+ExplicitTrapezoidal=(function()//y(i,n+1)=y(i,n)+dt/2*(f(t,y(n))+f(t+dt,y(n+1')))
 {
 		/*
 		y(n+1)=y(n)*0.5+y(n+1')*0.5+h*0.5*f(t+dt,y(n+1'))
@@ -184,19 +180,17 @@ Trapezoidal=(function()//y(i,n+1)=y(i,n)+dt/2*(f(t,y(n))+f(t+dt,y(n+1')))
 		{
 			var count=xv.length;
 			var k=new Array(count);
-			var t=new Array(count);
+			var temp=new Array(count);
 			for(var i=0;i<count;i++)
 			{
-				t[i]=xv[i]+funcs[i](t,xv);
+				temp[i]=xv[i]+funcs[i](xv,t)*delta;
 			}
 			var t_next=t+delta;
 			for(var i=0;i<count;i++)
 			{
 				//k[i]=delta*0.5*(funcs[i](t,xv)+funcs[i](t_next,t));
-				k[i]=(funcs[i](t_next,t)*h+t[i]-xv[i])*0.5;
+				xv[i]=(funcs[i](temp,t_next)*delta+temp[i]+xv[i])*0.5;
 			}
-			for(var i=0;i<count;i++)
-				xv[i]=xv[i]+k[i];
 		}
 		return {Step:Step};
 	})();
@@ -210,7 +204,7 @@ ExplicitEulerSystem=(function()//y(i,n+1)=y(i,n)+dt*f(t,y(n))
 		var k=new Array(count);
 		for(var i=0;i<count;i++)
 		{
-			k[i]=delta*funcs[i](t,xv);
+			k[i]=delta*funcs[i](xv,t);
 		}
 		for(var i=0;i<count;i++)
 			xv[i]+=k[i];
@@ -223,7 +217,7 @@ ExplicitEulerSystem=(function()//y(i,n+1)=y(i,n)+dt*f(t,y(n))
 			var k=new Array(count);
 			for(var i=0;i<count;i++)
 			{
-				k[i]=delta*funcs[i](t,xv);
+				k[i]=delta*funcs[i](xv,t);
 			}
 			for(var i=0;i<count;i++)
 				xv[i]+=k[i];
@@ -232,7 +226,7 @@ ExplicitEulerSystem=(function()//y(i,n+1)=y(i,n)+dt*f(t,y(n))
 			var k=new Array(count);
 			for(var i=0;i<count;i++)
 			{
-				k[i]=delta*funcs[i](t,xv);
+				k[i]=delta*funcs[i](xv,t);
 			}
 			for(var i=0;i<count;i++)
 				k[i]+=xv[i];
@@ -242,13 +236,13 @@ ExplicitEulerSystem=(function()//y(i,n+1)=y(i,n)+dt*f(t,y(n))
 			var k2=new Array(count);
 			for(var i=0;i<count;i++)
 			{
-				k2[i]=d2*funcs[i](t,xv);
+				k2[i]=d2*funcs[i](xv,t);
 			}
 			for(var i=0;i<count;i++)
 				xv_temp[i]=xv[i]+k2[i];
 			for(var i=0;i<count;i++)
 			{
-				k2[i]=xv[i]+d2*funcs[i](t+d2,xv_temp);
+				k2[i]=xv[i]+d2*funcs[i](xv_temp,t+d2);
 			}
 			var difference=0;
 			for(var i=0;i<count;i++)
@@ -265,7 +259,6 @@ ExplicitEulerSystem=(function()//y(i,n+1)=y(i,n)+dt*f(t,y(n))
 				}
 				return delta;
 			}
-
 		}
 		return {Step:Step};
 	})();
@@ -278,11 +271,11 @@ ImplicitEulerSystem=(function()//FixedPointIteration
 		var k=new Array(count);
 		for(var i=0;i<count;i++)
 		{
-			k[i]=xv[i]+delta*funcs[i](t,xv);
+			k[i]=xv[i]+delta*funcs[i](xv,t);
 		}
 		for(var i=0;i<count;i++)
 		{
-			xv[i]=xv[i]+delta*funcs[i](t,k);
+			xv[i]=xv[i]+delta*funcs[i](k,t);
 		}
 	}
 	return {Step:Step};
@@ -295,14 +288,14 @@ MidpointSystem=(function()//y(i,n+1)=y(i,n)+dt*f(t+dt*0.5,(y(n)+y(n+1))*0.5)
 		var count=xv.length;
 		var k=new Array(count);
 		t_average=t+delta*0.5;
-		var t=new Array(count);
+		var temp=new Array(count);
 		for(var i=0;i<count;i++)
 		{
-			t[i]=(xv[i]+funcs[i](t,xv)*0.5);
+			temp[i]=(xv[i]+funcs[i](xv,t)*delta*0.5);
 		}
 		for(var i=0;i<count;i++)
 		{
-			k[i]=delta*funcs[i](t_average,t);
+			k[i]=delta*funcs[i](temp,t_average);
 		}
 		for(var i=0;i<count;i++)
 			xv[i]+=k[i];

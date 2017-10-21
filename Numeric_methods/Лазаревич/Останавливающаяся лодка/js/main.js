@@ -66,84 +66,6 @@ var Model=(function(){
 })();
 
 
-var CatMouseModel=(function(){
-	var functions=new Array(4);//xm,ym,xk,yk
-	var initial=new Array(4);
-	var hx,hy;
-	function init(vm,vk,xk,yk,xm,ym,hxm,hym)
-	{
-		hx=hxm;
-		hy=hym;
-		var vmx=hx-xm,vmy=hy-ym;
-		var vkx=hx-xk,vky=hy-yk;
-		var lmInv=vm/Math.sqrt(vmx*vmx+vmy*vmy),lkInv=vk/Math.sqrt(vkx*vkx+vky*vky);
-		vmx*=lmInv;
-		vmy*=lmInv;
-		vkx*=lkInv;
-		vky*=lkInv;
-		functions[0]=function(x,t)
-		{
-			return vmx;
-		};
-		functions[1]=function(x,t)
-		{
-			return vmy;
-		};
-		functions[2]=function(x,t)
-		{
-			return vkx;
-		};
-		functions[3]=function(x,y)
-		{
-			return vky;
-		};
-		initial[0]=xm;
-		initial[1]=ym;
-		initial[2]=xk;
-		initial[3]=yk;
-	}
-	function setParameters(vm,vk)
-	{	
-		var vmx=hx-xm,vmy=hy-ym;
-		var vkx=hx-xk,vky=hy-yk;
-		var lmInv=vm/Math.sqrt(vmx*vmx+vmy*vmy),lkInv=vk/Math.sqrt(vkx*vkx+vky*vky);
-		vmx*=lmInv;
-		vmy*=lmInv;
-		vkx*=lkInv;
-		functions[0]=function(x,t){
-			return vmx;
-		};
-		functions[1]=function(x,t){
-			return vmy;
-		};
-		functions[2]=function(x,t)
-		{
-			return vkx;
-		};
-		functions[3]=function(x,y){
-			return vky;
-		};
-	}
-	function distanceSqrCat()
-	{
-		var dx=hx-initial[2],dy=hy-initial[3];
-		return (dx*dx-dy*dy);
-	}
-	function distanceSqrMouse()
-	{
-		var dx=hx-initial[0],dy=hy-initial[1];
-		return (dx*dx-dy*dy);
-	}
-	return {
-		functions:functions,
-		init:init,
-		initial:initial,
-		setParameters:setParameters,
-		distanceSqrCat:distanceSqrCat,
-		distanceSqrMouse:distanceSqrMouse
-	}
-})();
-
 var modelTime=0;
 var viewTime=0;
 var fpsdelta=1000.0/30.0;
@@ -183,26 +105,6 @@ var beta;
 var velocity;
 var mass;
 window.addEventListener('load',init);
-
-
-/*
-add zoom buttons: -+
-https://bl.ocks.org/mbostock/7ec977c95910dd026812
-
-add constrained camera: ++
-https://bl.ocks.org/mbostock/3892928
-
-
-add additional axis lines, tick 10 cm:
-
-
-*/
-
-
-
-
-
-
 
 
 var svg;
@@ -323,8 +225,6 @@ function initsvg()
 
 function init()
 {
-	//canvas=document.getElementById("canvas");
-	//ctx=canvas.getContext("2d");
 	button=document.getElementById("button");
 	button.onclick=start;
 	alpha=document.getElementById("alpha");
@@ -353,11 +253,6 @@ function draw(initial)
 	//scene.data([{translate:[-initial[0]*50*scale-width*shift,-height*shift],scale:scale}]);
 	zoom.translate([(-initial[0]*50*scale-width*shift),-height*shift]).event(field);
 	//field.call(zoom.transform,d3.zoomIdentity.translate());
-	/*ctx.clearRect(0, 0, canvas.width, canvas.height);
-	ctx.beginPath();
-	ctx.arc(initial[0],canvas.height/2,10.0,0,2*Math.PI);
-	ctx.fillStyle="red";
-	ctx.fill();*/
 }
 var j=0;
 function loop(timestamp)
@@ -367,36 +262,34 @@ function loop(timestamp)
 	var vdt=(timestamp-viewTime);
 	var i=0;
 	var k=Math.max(1,Math.round(drawdelta/physdelta));
+	
+	if(timestamp>=(viewTime+fpsdelta))
+	{
+		draw(Model.initial);
+		viewTime=timestamp-(vdt%fpsdelta);
+	}
 	while(mdt>=physdelta)
 	{
 		i++;
-		RK4SolverStep(Model.initial,modelTime,physdelta*0.001,Model.functions);
+		RK4SolverStep(Model.initial,tClean*0.001,physdelta*0.001,Model.functions);
 		j++;	
-		//modelTime+=physdelta;
 		tClean+=physdelta;
-
-		if(j>=k)
+		modelTime+=physdelta;
+		mdt-=physdelta;
+		if(j>=k)//отрисовка
 		{
-			
-			/*data.x.push(tClean);
-			data.y.push(Model.initial[0]);*/
 			var layout={
 				'xaxis.range[1]':tClean*0.001+1,
 				'yaxis.range[1]':Model.initial[0]*1.1+1
 
 			}
-			//Plotly.update("tester",{data},layout)
-			if(data[0].x.length>100)
+			if(data[0].x.length>500)//удаление лишних точек
 			{
-				/*data[0].x.shift();
-				data[0].y.shift();*/
 				data[0].x.splice(0,20);
 				data[0].y.splice(0,20);
 			}
-			if(v_data[0].x.length>100)
+			if(v_data[0].x.length>500)
 			{
-				/*v_data[0].x.shift();
-				v_data[0].y.shift();*/
 				v_data[0].x.splice(0,20);
 				v_data[0].y.splice(0,20);
 			}
@@ -412,7 +305,6 @@ function loop(timestamp)
 			Plotly.relayout("velocity_graph",{'xaxis.range[1]':tClean*0.001+1,'yaxis.range[0]':Model.initial[1]-1.0});
 			j=0;
 		}
-		mdt-=physdelta;
 		if(i>10)
 		{
 			modelTime=timestamp;
@@ -426,11 +318,6 @@ function loop(timestamp)
 				window.alert('Слишком большой шаг не позволяет получить сходящуюся к нулю скорость');
 				stop(); 
 				return;
-	}
-	if(timestamp>=(viewTime+fpsdelta))
-	{
-		draw(Model.initial);
-		viewTime=timestamp-(vdt%fpsdelta);
 	}
 	if(Model.initial[1]<epsilon)//условие остановки
 	{

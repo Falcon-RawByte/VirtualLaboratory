@@ -2,28 +2,10 @@
 <head>
 	<meta charset="utf-8">
 	<title>Решатели</title>
-	<link rel="stylesheet" type="text/css" href="./reset.css">
-	<link rel="stylesheet" type="text/css" href="./solvers.css">
-	<style>
-		.grid_svg{
-			font:10px sans-serif;
-			shape-rendering: crispEdges;
-		}
-		.axis path
-		{
-			fill:none;
-			stroke:none;
-		}
-		.axis line
-		{
-			fill:none;
-			stroke:#000;
-		}
-
-	</style>
-	<script src="./plotly-latest.min.js"></script>
-	<script src="./solvers.js"></script>
-	<script src="http://d3js.org/d3.v3.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="./css/reset.css">
+	<link rel="stylesheet" type="text/css" href="./css/solvers.css">
+	<script src="./js/plotly-latest.min.js"></script>
+	<script src="./js/solvers.js"></script>
 </head>
 <body>
 	<div id="methodCollection">
@@ -63,10 +45,11 @@
 			<input id="removeMethodButton" value="Удалить" type="Button">
 		</div>-->
 	</div>
-		<input id="addMethodButton" value="Добавить" onclick="SolversCheck.AddMethod()" type="Button">
-	<!--<canvas id="canvas" width="400px" height="40px" style=""></canvas>-->
+
+		<div style="margin:5px">* - нереализованные функции</div>
+		<input id="addMethodButton" value="Добавить метод" onclick="SolversCheck.AddMethod()" type="Button">
 <input id="startButton" type="button" value="Старт"></input>
 <div id="graph" style="width:600px;height:250px;"></div>
 </body>
-<script src="./solvers_check.js"></script>
+<script src="./js/solvers_check.js"></script>
 </html>
