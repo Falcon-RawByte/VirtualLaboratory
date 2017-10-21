@@ -1,0 +1,72 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Решатели</title>
+	<link rel="stylesheet" type="text/css" href="./reset.css">
+	<link rel="stylesheet" type="text/css" href="./solvers.css">
+	<style>
+		.grid_svg{
+			font:10px sans-serif;
+			shape-rendering: crispEdges;
+		}
+		.axis path
+		{
+			fill:none;
+			stroke:none;
+		}
+		.axis line
+		{
+			fill:none;
+			stroke:#000;
+		}
+
+	</style>
+	<script src="./plotly-latest.min.js"></script>
+	<script src="./solvers.js"></script>
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+</head>
+<body>
+	<div id="methodCollection">
+		<!--<div class="methodEditor">
+			<div style="display: table;border-spacing:5px;">
+				<div class="table_row">	
+				<label class="table_label">Метод</label>
+					<select id="method" class="table_input">
+				<optgroup label="CITY 1">
+					<option value="0" selected>1</option>
+					<option value="1">2</option>
+					</optgroup>
+				<optgroup label="CITY 1">
+					<option value="2">3</option>
+					<option value="3">4</option>
+					<option value="4">5</option>
+					</optgroup>
+					</select>
+				</div>
+				<div class="table_row">	
+					<label class="table_label">Мин. шаг, мс</label>
+					<input class="table_input" id="minStep" type="number" value="0.1" step="0.1">
+				</div>
+				<div class="table_row">	
+					<label class="table_label">Макс. шаг, мс</label>
+					<input class="table_input" id="maxStep" type="number" value="10" step="0.1">
+				</div>
+				<div class="table_row">	
+					<label class="table_label">Допустимая ошибка</label>
+					<input class="table_input" id="error" type="number" value="20" step="10">
+				</div>
+				<div class="table_row">	
+					<label class="table_label">Цвет</label>
+					<input class="table_input" id="color" type="color" value="#0000FF">
+				</div>
+			</div>
+			<input id="removeMethodButton" value="Удалить" type="Button">
+		</div>-->
+	</div>
+		<input id="addMethodButton" value="Добавить" onclick="SolversCheck.AddMethod()" type="Button">
+	<!--<canvas id="canvas" width="400px" height="40px" style=""></canvas>-->
+<input id="startButton" type="button" value="Старт"></input>
+<div id="graph" style="width:600px;height:250px;"></div>
+</body>
+<script src="./solvers_check.js"></script>
+</html>
