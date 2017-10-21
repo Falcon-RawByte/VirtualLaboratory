@@ -17,6 +17,10 @@
 <body>
 	<h1>Обнаружение событий.<span class="orange">js</span><small> - прыгающий мячик</small> </h1>
 
+	<div class="canvas">
+		Ряд задач моделирования включает в себя обнаружение событий в системе, каким-то образом влияющих на поведение. Простой пример такой системы - прагающий мячик, отскакивающий от пола. Сам по себе мячик всегда обладает постоянной скоростью Vx и постоянным ускорением g. Однако в момент касания мячик долен изменить направление по оси y, при этом потеряв часть энергии при ударе. Точность при обнаружении этого события может сильно влиять на получившуюся траекторию движения и давать отклонение от аналитического решения.
+	</div>
+
 	<form>
 		<label>Шаг итерации (в мс)</label>
 		<input type="number" id="dt" step="10" value="50">
@@ -24,21 +28,19 @@
 		<label>H (в метрах)</label>
 		<input type="number" id="H" step="10" value="200">
 
-		<label>S (в метрах)</label>
-		<input type="number" id="S" step="10" value="100">
-
 		<label>V<sub>ball</sub> (в м/с)</label>
 		<input type="number" id="Vb" step="10" value="30">
 
-		<label>V<sub>airplane</sub> (в м/с)</label>
-		<input type="number" id="Va" step="10" value="50">
+		<label>&beta; в пределах [0,1]</label>
+		<input type="number" id="beta" step="0.05" value="0.6">
 
 		<label>&alpha; (в градусах)</label>
 		<input type="number" id="A" step="0.01" value="0">
+
+		<p><a href="javascript:window.startDemo()">Начать Моделирование</a>
+		<a href="javascript:window.stopDemo()">Остановить Моделирование</a></p>
 	</form>
 
-	<p><a href="javascript:window.startDemo()">Start Demo</a></p>
-	<p><a href="javascript:window.stopDemo()">Stop Demo</a></p>
 	<canvas id="myCanvas" width="900" height="500"></canvas>
 
 	<ul id="result"></ul>

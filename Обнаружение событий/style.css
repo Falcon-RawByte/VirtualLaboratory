@@ -17,8 +17,22 @@ h1 small {
 }
 
 form {
-	width: 50%;
+	position: absolute;
+	margin-top: 5%; 
+	/*width: 50%;*/
 	margin-left: 50%;
+}
+
+a {
+	display: inline;
+	color: black;
+	text-decoration: none;
+	
+	padding: 3px 16px 3px 16px;
+  	border-top: 1px solid #CCCCCC;
+  	border-right: 1px solid #333333;
+  	border-bottom: 1px solid #333333;
+  	border-left: 1px solid #CCCCCC;
 }
 
 input {
