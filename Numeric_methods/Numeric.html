@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>numeric</title>
+	<script src="js/jquery-3.2.1.min.js"></script>
+	<script src="js/main.js"></script>
+</head>
+<body>
+	<canvas id="myCanvas" width="400" height="400" style="border:1px solid #000000;"></canvas><br>
+<!-- 	<svg width="1200" height="1200">
+		<circle cx="5" cy="5" r="4" stroke="green" stroke-width="1" fill="yellow" />
+	</svg> -->
+
+	<table>
+
+
+	  <tr>
+	    <td><label> graph colour</label></td>
+		<td> 
+			<select id="colors">
+				<option value="green">green</option>
+				<option value="yellow">yellow</option>
+				<option value="red">red</option>
+				<option value="black">black</option>
+				<option value="blue">blue</option>
+			</select>
+		</td>
+	  </tr>
+	  <tr>
+	    <td><label>x - coord of displacement</label></td>
+	    <td><input type="number" value="40" id="x"></td>
+	  </tr>
+	  <tr>
+	    <td><label>v - starting velocity </label></td>
+	    <td><input type="number" id="v" value = "50"></td>
+	  </tr>
+  	  <tr>
+	    <td><label>m - mass </label></td>
+	    <td><input type="number" id="m" value = "1"></td>
+	  </tr>
+  	  <tr>
+	    <td><label>h - enviroment resistance const </label></td>
+	    <td><input type="number" id="h" value = "0.2"></td>
+	  </tr>
+  	  <tr>
+	    <td><label>k - coefficient of elasticity </label></td>
+	    <td><input type="number" id="k" value = "0.6"></td>
+	  </tr>
+  	  <tr>
+	    <td><label>f - force </label></td>
+	    <td><input type="number" id="f" value = "2"></td>
+	  </tr>
+  	  <tr>
+	    <td><label>n - number of iterations </label></td>
+	    <td><input type="number" id="n" value = "450"></td>
+	  </tr>
+	  <tr>
+	    <td><button id = "button" align="middle">Calculate</button></td>
+	    <td><button id = "buttonErase" align="middle">Erase</button></td>
+	  </tr>
+	</table>
+</body>
+</html>
