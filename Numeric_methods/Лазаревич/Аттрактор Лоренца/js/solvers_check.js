@@ -35,6 +35,11 @@ function init()
 	methods.push({method:ExplicitEulerSystem,name:'ExplicitEuler'});
 	methods.push({method:ExplicitTrapezoidal,name:'ExplicitTrapezoidal'});
 	methods.push({method:Ralston,name:'Ralston'});
+	methods.push({method:ImplicitEulerJacobian,name:'ImplicitEulerJacobian'});
+	methods.push({method:ImplicitMidpoint,name:'ImplicitMidpoint'});
+	methods.push({method:ImplicitTrapezoidal,name:'ImplicitTrapezoidal'});
+	methods.push({method:ImplicitRadauI5,name:'ImplicitRadauI5'});
+
 	/*methods.push({method:VelocityVerlet,name:'VelocityVerlet'});
 	methods.push({method:StormerVerlet,name:'StormerVerlet'});
 	methods.push({method:SemiImplicitEuler,name:'SemiImplicitEuler'});*/
@@ -57,6 +62,10 @@ function AddMethod()
 					<option value="3">ExplicitEuler</option>
 					<option value="4">ExplicitTrapezoidal</option>
 					<option value="5">Ralston</option>
+					<option value="6">ImplicitEulerJacobian</option>
+					<option value="7">ImplicitMidpoint</option>
+					<option value="8">ImplicitTrapezoidal</option>
+					<option value="9">ImplicitRadauI5</option>
 					</optgroup>
 					</select>
 				</div>
@@ -113,7 +122,7 @@ function StartSolving()
 			localTime:performance.now(),
 			modelTime:performance.now()
 			};
-			data[i]={type:'scatter',line:{color:solvers[i].Color},name:solvers[i].method.name,x:[task.values[0]],y:[task.values[1]]};
+			data[i]={type:'scatter3d',marker:{size:1.0,color:solvers[i].Color},line:{color:solvers[i].Color},name:solvers[i].method.name,x:[task.values[0]],y:[task.values[1]],z:[task.values[2]]};
 		}
 	Plotly.newPlot('graph',data,{/*xaxis:{range:[0,1]},yaxis:{range:[0,1]}*/title:'xy',xaxis:{title:'x'},yaxis:{title:'y'}});
 	startButton.value="Стоп";
@@ -132,11 +141,11 @@ function Solving(timestamp)
 			data.y.push(Model.initial[0]);*/
 			solvers.forEach(function(item,i)
 			{
-				var mdt=timestamp-item.localTime;
+				var mdt=timestamp-item.modelTime;
 			if(mdt>=item.minStep)
 			{
-				item.ModelTime+=item.minStep;
-				item.method.method.Step(item.data,item.modelTime,item.minStep*0.001,task.functions);
+				item.method.method.Step(item.data,item.modelTime*0.001,item.minStep*0.001,task.functions);
+				item.modelTime+=item.minStep;
 			if(data[i].x.length>1000)
 			{
 				/*data[0].x.shift();
@@ -144,7 +153,7 @@ function Solving(timestamp)
 						data[i].x.splice(0,200);
 						data[i].y.splice(0,200);
 			}
-			Plotly.extendTraces("graph",{x:[[item.data[0]]],y:[[item.data[1]]]},[i]);
+			Plotly.extendTraces("graph",{x:[[item.data[0]]],y:[[item.data[1]]],z:[[item.data[2]]]},[i]);
 			item.localTime=timestamp;
 			}
 			});
@@ -164,4 +173,3 @@ startButton.value="Старт";
 startButton.onclick=StartSolving;
 return{AddMethod:AddMethod,StartSolving:StartSolving,StopSolving:StopSolving};
 })();
-

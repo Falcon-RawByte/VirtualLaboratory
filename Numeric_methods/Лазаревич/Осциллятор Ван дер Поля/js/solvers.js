@@ -50,7 +50,7 @@ ExplicitTrapezoidal=(function()//y(i,n+1)=y(i,n)+dt/2*(f(t,y(n))+f(t+dt,y(n+1'))
 		return {Step:Step,attributes:{name:'Explicit Trapezoidal'}};
 	})();
 ImplicitTrapezoidal=(function(){//∂F(i)/∂y(s+1,j)=δ(i,j)-0.5*h*∂f(t+h,y(s+1,j))/∂y(s+1,j))
-	function StepFuncJ(xv,t,step,funcs,jacobian)
+	function StepFunkJ(xv,t,step,funcs,jacobian)
 	{
 		var count=xv.length;
 		var max_iteration=20;
@@ -92,7 +92,7 @@ ImplicitTrapezoidal=(function(){//∂F(i)/∂y(s+1,j)=δ(i,j)-0.5*h*∂f(t+h,y(s
 					{
 						for(var i=0;i<count;i++)
 						{	
-							var df=-0.5*step*jacobian[i+j*count](y,t_next);
+							var df=0.5*step*jacobian[i+j*count](y,t_next);
 							if(i==j)
 								df+=1.0;
 							jacobian_m[i+j*count]=df;
@@ -647,7 +647,7 @@ ImplicitEulerJacobian=(function()//done
 					{
 						for(var i=0;i<count;i++)
 						{	
-							var df=-step*jacobian[i+j*count](y,t_next);
+							var df=step*jacobian[i+j*count](y,t_next);
 							if(i==j)
 								df+=1.0;
 							jacobian_m[i+j*count]=df;
@@ -815,7 +815,7 @@ ImplicitMidpoint=(function(){//∂F(i)/∂y(s+1,j)=δ(i,j)-0.5*h*∂f(t+h*0.5,0.
 					{
 						for(var i=0;i<count;i++)
 						{	
-							var df=-0.5*step*jacobian[i+j*count](y_old_new,t_next);
+							var df=0.5*step*jacobian[i+j*count](y_old_new,t_next);
 							if(i==j)
 								df+=1.0;
 							jacobian_m[i+j*count]=df;
@@ -1286,7 +1286,7 @@ ImplicitMidpoint=(function(){//∂F(i)/∂y(s+1,j)=δ(i,j)-0.5*h*∂f(t+h*0.5,0.
 								{	for(var i=0;i<count;i++,m++,z++)
 									{
 										var k_temp=ktemp[p][i];
-										var df=-jacobian[j*count+i]()*a_m[p*k_number+l]*step;
+										var df=jacobian[j*count+i]()*a_m[p*k_number+l]*step;
 										if(m==it)
 											df+=1.0;
 										jacobian_m[z]=df;
@@ -1347,7 +1347,7 @@ ImplicitMidpoint=(function(){//∂F(i)/∂y(s+1,j)=δ(i,j)-0.5*h*∂f(t+h*0.5,0.
 							{	for(var i=0;i<count;i++,m++,z++)
 								{
 									var k_temp=ktemp[p][i];
-									var df=-jacobian[j*count+i]*a_m[p*k_number+l]*step;
+									var df=jacobian[j*count+i]*a_m[p*k_number+l]*step;
 									if(m==it)
 										df+=1.0;
 									jacobian_t[z]=df;

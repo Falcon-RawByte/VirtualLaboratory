@@ -1,0 +1,68 @@
+
+.table_label
+{
+display:table-cell;
+text-align:right;
+}
+
+.table_input
+{
+	display:table-cell;
+	margin-left:10px;
+}
+.table_row
+{
+	display:table-row;
+}
+
+#startButton
+{
+	display:block;
+	margin:auto;
+
+}
+.optionBlock
+{
+	display:table-row-group;
+	margin:auto;
+}
+.optionBlock[disabled]
+{
+	display:table-row-group;
+	margin:auto;
+    pointer-events:none;
+}
+.optionBlock[disabled] input,.optionBlock[disabled] select
+{
+	background:gray;
+}
+
+#graph
+{
+	margin:auto;
+}
+
+.methodEditor
+{
+	display: inline-block;
+	border: 1px solid black;
+	padding: 5px;
+	margin: 5px;
+	vertical-align:top;
+}
+
+#addMethodButton, .removeMethodButton
+{
+	display:block;
+	margin:auto;
+	margin-top:5px;
+	margin-bottom:5px;
+}
+#methodCollection
+{
+	white-space: nowrap;
+	border: 1px solid black;
+	padding: 10px;
+	margin: 5px;
+	overflow-y: auto;
+}
