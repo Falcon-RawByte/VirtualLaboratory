@@ -152,6 +152,7 @@ function Solving(timestamp)
 				data[0].y.shift();*/
 						data[i].x.splice(0,200);
 						data[i].y.splice(0,200);
+						data[i].z.splice(0,200);
 			}
 			Plotly.extendTraces("graph",{x:[[item.data[0]]],y:[[item.data[1]]],z:[[item.data[2]]]},[i]);
 			item.localTime=timestamp;

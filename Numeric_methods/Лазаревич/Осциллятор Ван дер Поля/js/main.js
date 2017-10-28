@@ -154,12 +154,17 @@ Task=(function()
 				function createPlot(divId,plotArray,values,argument)
 				{
 					var div=document.getElementById(divId);
+					var divPlot=document.createElement('div');
 					var plots=new Array();
 					plotArray.forEach(function(item)
 					{
 						var graphBlock=document.createElement('div');
-						graphBlock.style.display="block";
-						div.appendChild(graphBlock);
+						//graphBlock.style.display="inline-block";
+						//graphBlock.style.width='500px';
+						//graphBlock.style.height='500px';
+						graphBlock.width='500px';
+						graphBlock.height='500px';
+						divPlot.appendChild(graphBlock);
 						graphBlock.indexes=[item.x.index,item.y.index];
 						if(item.z!==undefined){
 							graphBlock.indexes.push(item.z.index);
@@ -170,6 +175,7 @@ Task=(function()
 						}
 						plots.push(graphBlock);
 					});
+					div.appendChild(divPlot);
 					plotDivs=plots;
 				}
 				createPlot('taskBlock',taskModel.plot,taskModel.values,taskModel.argument);
@@ -623,7 +629,8 @@ Main=(function()
 			DormandPrice:DormandPrice,
 			ImplicitEulerJacobian:ImplicitEulerJacobian,
 			ImplicitMidpoint:ImplicitMidpoint,
-			ImplicitTrapezoidal:ImplicitTrapezoidal
+			ImplicitTrapezoidal:ImplicitTrapezoidal,
+			ImplicitRadauI5,ImplicitRadauI5
 		},Task.options);
 		startButton=document.getElementById('startButton');
 		startButton.onclick=start;

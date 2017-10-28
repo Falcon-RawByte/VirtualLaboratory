@@ -1189,18 +1189,18 @@ ImplicitMidpoint=(function(){//∂F(i)/∂y(s+1,j)=δ(i,j)-0.5*h*∂f(t+h*0.5,0.
 						ret_data[ret_iter].push(y_opt[i]);
 					}
 				}
-				return ret_data
+				return ret_data;
 			}
 			function SolveFuncJ(data)
 			{
 
 
-
+				return;
 			}
 			function SolveConstJ(data)
 			{
 
-
+				return;
 			}
 			function StepFuncJ(xv,t,step,funcs,jacobian)
 			{
@@ -1273,10 +1273,6 @@ ImplicitMidpoint=(function(){//∂F(i)/∂y(s+1,j)=δ(i,j)-0.5*h*∂f(t+h*0.5,0.
 						return;
 					}
 					
-					if(k_difference<0.001)
-					{
-						return;
-					}
 					//solve system J(y_new(i))(dy)=-F(y_new(i))
 					//y_new(0)=y_old
 					for(var p=0,z=0,it=0;p<k_number;p++)
@@ -1286,7 +1282,7 @@ ImplicitMidpoint=(function(){//∂F(i)/∂y(s+1,j)=δ(i,j)-0.5*h*∂f(t+h*0.5,0.
 								{	for(var i=0;i<count;i++,m++,z++)
 									{
 										var k_temp=ktemp[p][i];
-										var df=jacobian[j*count+i]()*a_m[p*k_number+l]*step;
+										var df=jacobian[j*count+i](y,t)*a_m[p*k_number+l]*step;
 										if(m==it)
 											df+=1.0;
 										jacobian_m[z]=df;
@@ -1294,8 +1290,8 @@ ImplicitMidpoint=(function(){//∂F(i)/∂y(s+1,j)=δ(i,j)-0.5*h*∂f(t+h*0.5,0.
 									}
 								}
 							}
-							jacobian_m=jacobian_t.slice();
 							var dk=gaussSolve(jacobian_m,f);
+							k_difference=0;
 							for(var i=0;i<count;i++)
 							{
 								var temp=0;
@@ -1307,6 +1303,10 @@ ImplicitMidpoint=(function(){//∂F(i)/∂y(s+1,j)=δ(i,j)-0.5*h*∂f(t+h*0.5,0.
 									temp+=k_v[p]*b_v[j];
 								}
 								y[i]=y_old[i]+temp*step;
+							}
+							if(k_difference<0.001)
+							{
+								return;
 							}
 							k++;
 						}
@@ -1358,7 +1358,7 @@ ImplicitMidpoint=(function(){//∂F(i)/∂y(s+1,j)=δ(i,j)-0.5*h*∂f(t+h*0.5,0.
 		//критерии остановки
 		var k=0;
 		var last_f_difference=Number.MAX_VALUE;
-		var k_difference=0;
+		var k_difference=Number.MAX_VALUE;
 		while(true)
 		{
 			var f_difference=0;//max norm for F(y_old+dy)
@@ -1399,14 +1399,11 @@ ImplicitMidpoint=(function(){//∂F(i)/∂y(s+1,j)=δ(i,j)-0.5*h*∂f(t+h*0.5,0.
 						return;
 					}
 
-					if(k_difference<0.001)
-					{
-						return;
-					}
 					//solve system J(y_new(i))(dy)=-F(y_new(i))
 					//y_new(0)=y_old
 					jacobian_m=jacobian_t.slice();
 					var dk=gaussSolve(jacobian_m,f);
+					k_difference=0;
 					for(var i=0;i<count;i++)
 					{
 						var temp=0;
@@ -1418,6 +1415,11 @@ ImplicitMidpoint=(function(){//∂F(i)/∂y(s+1,j)=δ(i,j)-0.5*h*∂f(t+h*0.5,0.
 							temp+=k_v[p]*b_v[j];
 						}
 						y[i]=y_old[i]+temp*step;
+					}
+
+					if(k_difference<0.001)
+					{
+						return;
 					}
 					k++;
 				}
@@ -1466,7 +1468,7 @@ ImplicitMidpoint=(function(){//∂F(i)/∂y(s+1,j)=δ(i,j)-0.5*h*∂f(t+h*0.5,0.
 		//критерии остановки
 		var k=0;
 		var last_f_difference=Number.MAX_VALUE;
-		var k_difference=0;
+		var k_difference=Number.MAX_VALUE;
 		while(true)
 		{
 			var f_difference=0;//max norm for F(y_old+dy)
@@ -1528,6 +1530,7 @@ ImplicitMidpoint=(function(){//∂F(i)/∂y(s+1,j)=δ(i,j)-0.5*h*∂f(t+h*0.5,0.
 							}
 						}
 						var dk=gaussSolve(jacobian,f);
+						k_difference=0;
 						for(var i=0;i<count;i++)
 						{
 							var temp=0;
