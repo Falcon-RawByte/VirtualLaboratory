@@ -94,7 +94,6 @@ Task=(function()
 				var plot=[{x:{index:values.length,description:'Время'},y:{index:0,description:'Значение X'},description:'График изменения x'},{x:{index:0,description:'Значение X'},y:{index:1,description:"Значения X'"},description:'Фазовый портрет'}];
 				function getFunctions(parameters)
 				{
-					var u=parameters[0];
 					var functions=new Array(2);
 					functions[0]=function(x,t)
 					{
@@ -102,6 +101,7 @@ Task=(function()
 					};
 					functions[1]=function(x,t)
 					{
+						var u=parameters[0];
 						var x0=x[0];
 						var v0=x[1];
 						return u*(1-x0*x0)*v0-x0;
@@ -110,7 +110,6 @@ Task=(function()
 				}
 				function getJacobian(parameters)
 				{
-					var u=parameters[0];
 					var jacobian=
 					[
 						function(xv,t)
@@ -124,10 +123,12 @@ Task=(function()
 						,
 						function(xv,t)
 						{
+							var u=parameters[0];
 							return -1-2.0*u*xv[0]*xv[1];
 						},
 						function(xv,t)
 						{
+							var u=parameters[0];
 							var x0=xv[0];
 							return u*(1-x0*x0);
 						}
@@ -162,16 +163,17 @@ Task=(function()
 						//graphBlock.style.display="inline-block";
 						//graphBlock.style.width='500px';
 						//graphBlock.style.height='500px';
-						graphBlock.width='500px';
+						graphBlock.width='350px';
 						graphBlock.height='500px';
+						graphBlock.style="display:inline-block;";
 						divPlot.appendChild(graphBlock);
 						graphBlock.indexes=[item.x.index,item.y.index];
 						if(item.z!==undefined){
 							graphBlock.indexes.push(item.z.index);
-							Plotly.newPlot(graphBlock,[{x:[0],y:[0],z:[0],type:'scatter3d',maxdisplayed:10000}],{title:item.description,xaxis:{title:item.x.description},yaxis:{title:item.y.description}});
+							Plotly.newPlot(graphBlock,[{x:[],y:[],z:[],type:'scatter3d',maxdisplayed:10000}],{showlegend:true,title:item.description,xaxis:{title:item.x.description},yaxis:{title:item.y.description}});
 						}else
 						{
-							Plotly.newPlot(graphBlock,[{x:[0],y:[0],type:'scatter',maxdisplayed:10000}],{title:item.description,xaxis:{title:item.x.description},yaxis:{title:item.y.description}});
+							Plotly.newPlot(graphBlock,[{x:[],y:[],type:'scatter',maxdisplayed:10000}],{showlegend:true,title:item.description,xaxis:{title:item.x.description},yaxis:{title:item.y.description}});
 						}
 						plots.push(graphBlock);
 					});
@@ -192,43 +194,22 @@ Task=(function()
 			{
 				parameters.push(parseFloat(item.value));
 			});
-			var argumentLength=values.pop();
+			var argumentDelta=values.pop();
 			var argument=values.pop();
 
-			var data={values:values,argument:argument,plot:taskModel.plot,argumentLength:argumentLength,parameters:parameters,functions:taskModel.getFunctions(parameters)};
-
+			var data={values:values,argument:argument,plot:taskModel.plot,argumentDelta:argumentDelta,parameters:parameters,functions:taskModel.getFunctions(parameters)};
+			if(taskModel.getJacobian!==undefined)
+			{
+				data.jacobian=taskModel.getJacobian(parameters)
+			}
 			return data;
 		}
 		function getOptions(options,values,argument,parameters)
 		{
 			var jacobian;
-			if(options.jacobian!==undefined)
+			if(options.jacobianCalc==1&&taskModel.getJacobian!==undefined)
 			{
-				var variants=[function()
-				{
-					return taskModel.getJacobian(parameters);
-				},
-				function()
-				{
-					var f=taskModel.getJacobian(parameters);
-					var j=new Array();
-					for(var i=0;i<f.length;i++)
-					{
-						j.push(f[i](values,argument));
-					}
-					return j;
-				},
-				function()
-				{
-					return undefined;
-				}
-				]
-				options.jacobian=variants[options.jacobian.value]();
-				if(options.jacobian===undefined)
-					delete options.jacobian;
-			}else
-			{
-				options.jacobian=undefined;
+				options.jacobianCalc=true;
 			}
 			return options;
 		}
@@ -244,12 +225,13 @@ Task=(function()
 			}
 			function drawPlot(data,index,methodName,methodColor)
 			{
+				index=Math.min(plotDivs[0].data.length);
 				plotDivs.forEach(function(item)
 				{
-					if(item.indexes.lenth==3)
-						Plotly.addTraces(item, {line:{color:methodColor},name:methodName,x:data[item.indexes[0]],y: data[item.indexes[1]],z:data[item.indexes[2]]}, index);
+					if(item.indexes.length==3)
+						Plotly.addTraces(item, {marker:{color:methodColor,size:3},line:{color:methodColor,shape:'linear'},name:methodName,x:data[item.indexes[0]],y: data[item.indexes[1]],mode: 'lines+markers',z:data[item.indexes[2]]}, index);
 					else
-						Plotly.addTraces(item, {line:{color:methodColor},name:methodName,x:data[item.indexes[0]],y: data[item.indexes[1]]}, index);
+						Plotly.addTraces(item, {marker:{color:methodColor,size:3},line:{color:methodColor,shape:'linear'},name:methodName,x:data[item.indexes[0]],y: data[item.indexes[1]],mode: 'lines+markers'}, index);
 				})
 			}
 		return {init:init,getTaskData:getTaskData,getOptions:getOptions,resetPlots:resetPlots,drawPlot:drawPlot};
@@ -263,7 +245,7 @@ Task=(function()
 		var methodCollection;
 		var methods;
 		var optionsGetters;
-			function init(blockId,methodList,taskOptions)//map name:method
+			function init(blockId,methodList)//map name:method
 			{
 				var block=document.getElementById(blockId);
 				methodCollection=document.createElement('form');
@@ -276,7 +258,7 @@ Task=(function()
 				for(var key in methodList)
 				{
 					var m=methodList[key];
-					methods.push({name:key,method:m});
+					methods.push({methodKey:key,method:m});
 				}
 
 				methodEditor=document.createElement('div');
@@ -303,8 +285,8 @@ Task=(function()
 				input.className='table_input step';
 				input.type='number';
 				input.value='20';
-				input.step='5';
-				input.min='5';
+				input.step='1';
+				input.min='1';
 				input.max='1000';
 				table_row.appendChild(label);
 				table_row.appendChild(input);
@@ -318,8 +300,25 @@ Task=(function()
 				input.type='color';
 				input.value="#0000FF";
 
+
+
 				
 
+				table_row.appendChild(label);
+				table_row.appendChild(input);
+				divTable.appendChild(table_row);
+
+				table_row=table_row.cloneNode(false);
+
+				label=label.cloneNode(false);
+				label.appendChild(document.createTextNode('Пропуск точек'));
+				var input=document.createElement('input');
+				input.className='table_input drawStep';
+				input.type='number';
+				input.value='0';
+				input.step='1';
+				input.min='0';
+				input.max='100';
 				table_row.appendChild(label);
 				table_row.appendChild(input);
 				divTable.appendChild(table_row);
@@ -335,7 +334,7 @@ Task=(function()
 
 				table_row=table_row.cloneNode(false);
 				label=label.cloneNode(false);
-				label.appendChild(document.createTextNode('Минимальный шаг'));
+				label.appendChild(document.createTextNode('Минимальный шаг, мс'));
 				label.className='table_label';
 				input=document.createElement('input');
 				input.className='table_input minStep';
@@ -350,7 +349,7 @@ Task=(function()
 
 				table_row=table_row.cloneNode(false);
 				label=label.cloneNode(false);
-				label.appendChild(document.createTextNode('Максимальный шаг'));
+				label.appendChild(document.createTextNode('Максимальный шаг, мс'));
 				label.className='table_label';
 				input=document.createElement('input');
 				input.className='table_input maxStep';
@@ -362,13 +361,29 @@ Task=(function()
 				table_row.appendChild(label);
 				table_row.appendChild(input);
 				divOptions.appendChild(table_row);
+
+				table_row=table_row.cloneNode(false);
+				label=label.cloneNode(false);
+				label.appendChild(document.createTextNode('Допустимая ошибка'));
+				label.className='table_label';
+				input=document.createElement('input');
+				input.className='table_input errorTolerance';
+				input.type='number';
+				input.value='0.001';
+				input.step='any';
+				input.min='0.0001';
+				table_row.appendChild(label);
+				table_row.appendChild(input);
+				divOptions.appendChild(table_row);
+
 				options.push(divOptions);
 				optionsBlocks.autoStep=options.length-1;
 				optionsGetters.push(function(block)
 					{
 						var data={};
-						data.minStep=block.getElementsByClassName(minStep)[0];
-						data.maxStep=block.getElementsByClassName(maxStep)[0];
+						data.minStep=parseFloat(block.getElementsByClassName('minStep')[0].value)*0.001;
+						data.maxStep=parseFloat(block.getElementsByClassName('maxStep')[0].value)*0.001;
+						data.errorTolerance=parseFloat(block.getElementsByClassName('errorTolerance')[0].value);
 						return data;
 					});
 				methodEditor.appendChild(divOptions);
@@ -380,33 +395,50 @@ Task=(function()
 
 				table_row=table_row.cloneNode(false);
 				label=label.cloneNode(false);
-				label.appendChild(document.createTextNode('Использование якобиана'));
+				label.appendChild(document.createTextNode('Расчёт матрицы Якоби'));
 				label.className='table_label';
 				input=document.createElement('select');
-				input.className='table_input jacobianUsage';
+				input.className='table_input jacobianCalc';
 				var option=document.createElement('option');
-				option.value='2';
+				option.value='0';
 				option.appendChild(document.createTextNode('Численный'));
 				input.appendChild(option);
 				option=document.createElement('option');
-				option.value='0';
-				option.appendChild(document.createTextNode('Аналитический'));
-				input.appendChild(option);
-				option=document.createElement('option');
 				option.value='1';
-				option.appendChild(document.createTextNode('Константный'));
+				option.appendChild(document.createTextNode('Аналитический'));
 				input.appendChild(option);
 				table_row.appendChild(label);
 				table_row.appendChild(input);
+
+
+
+
 				divOptions.appendChild(table_row);
+				table_row=table_row.cloneNode(false);
+				label=label.cloneNode(false);
+				label.appendChild(document.createTextNode('Константная матрица Якоби'));
+				label.className='table_label';
+				input=document.createElement('input');
+				input.checked=false;
+				input.type='checkbox';
+				input.className='jacobianConst table_input';
+
+
+				table_row.appendChild(label);
+				table_row.appendChild(input);
+				divOptions.appendChild(table_row);
+
 				options.push(divOptions);
 				optionsBlocks.useJacobian=options.length-1;
 				optionsGetters.push(function(block)
 					{
 						var data={};
-						data.jacobian=block.getElementsByClassName('jacobianUsage')[0];
+						data.jacobianCalc=block.getElementsByClassName('jacobianCalc')[0].value;
+						data.jacobianConst=block.getElementsByClassName('jacobianConst')[0].checked;
 						return data;
 					});
+
+
 				methodEditor.appendChild(divOptions);
 
 				//selectList.optionsBlocks=optionsBlocks;
@@ -479,6 +511,8 @@ Task=(function()
 					}
 					mE.appendChild(removeButton);
 					methodCollection.appendChild(mE);
+					//select.childNodes[0].setAttribute('selected','');
+					select.dispatchEvent(new Event('change'));
 				}
 				block.appendChild(addButton);
 			}
@@ -500,7 +534,8 @@ Task=(function()
 						method:methods[select.selectedIndex],
 						step:parseFloat(item.getElementsByClassName('step')[0].value)*0.001,
 						color:item.getElementsByClassName('color')[0].value,
-						options:{}
+						options:{},
+						drawStep:parseInt(item.getElementsByClassName('drawStep')[0].value)
 					};
 					temp.method.optionsBlocks.forEach(function(item,i)
 						{
@@ -517,37 +552,6 @@ Task=(function()
 			}
 			return {init:init,collectChoosenMethods:collectChoosenMethods};
 		})();
-var workerCode=function() {
-
-onmessage=function(e){
-	console.info('start',e.data);
-	importScripts(e.data);
-	var t0=sendData.t0;
-	var t1=sendData.t1;
-	var step=sendData.step;
-	var values=sendData.values;
-	var count=values.length;
-	var data=new Array(count+1);
-	var method=sendData.method;
-	var options=sendData.options;
-	var functions=sendData.functions;
-	console.info('start',step);
-	for(var i=0;i<=count;i++)
-		data[i]=new Array();
-	while(t0<=t1)
-	{
-		method.Step(values,t0,step,functions,options);
-
-		for(var i=0;i<count;i++)
-			data[i].push(values[i]);
-		data[count]=t0;
-		t0+=step;
-	}
-
-	var message={data:data,index:sendData.index};
-  	self.postMessage(message);
-  }
-};
 
 
 Main=(function()
@@ -574,37 +578,21 @@ Main=(function()
 				worker=null;
 			}
 		}*/
-		solvers=MethodPicker.collectChoosenMethods();
+		var solvers=MethodPicker.collectChoosenMethods();
 		if(solvers.length==0)
 			return;
-		var data=Task.getTaskData();
+		var data=Task.getTaskData();//var data={values:values,argument:argument,plot:taskModel.plot,argumentLength:argumentLength,parameters:parameters,functions:taskModel.getFunctions(parameters)};
+			
 		Task.resetPlots();
 		var counter=solvers.length;
-		tasks=new Array();
-		index=0;
-		maxIndex=counter;
-		count=data.values.length;
-		dataArray=new Array(count+1);
-		curPoints=1;
-		for(var k=0;k<count;k++)
-		{	dataArray[k]=new Array();
-			dataArray[k].push(data.values[k]);
-		}
-		dataArray[count]=new Array();
-		dataArray[count].push(data.argument);
-		solvers.forEach(function(item,i)
-		{
-			var sendData={method:item.method.method,index:i,step:item.step,t0:data.argument,t1:data.argument+data.argumentLength,values:data.values.slice(),functions:data.functions.slice(),options:Task.getOptions(item.options,data.values,data.argument,data.parameters)}
-			tasks.push(sendData);
-			/*var blob=new Blob([sendData]);
-			item.url=URL.createObjectURL(blob);
-			worker.postMessage(item.url);*/
-		})
-		currentTask=tasks[0];
-	timer=performance.now();
-	startButton.value="Стоп";
-	startButton.onclick=stop;
-	frameID=requestAnimationFrame(loop);
+
+
+		startButton.value="Стоп";
+		startButton.onclick=stop;
+		mainWorker.start(data,solvers,function(data,solver,index){
+			Task.drawPlot(data,index,solver.method.method.attributes.name,solver.color);
+		},stop);
+		return;
 	}
 	var tasks;
 	var index;
@@ -615,32 +603,24 @@ Main=(function()
 	var count;
 	var maxPoints=10000;
 	var curPoints=1;
+	var progressBar;
 	function init()
 	{
+		progressBar=document.getElementById('progressBar');
 		Task.init('taskBlock');
-		MethodPicker.init('methodBlock',
-		{
-			RK4:RK4System,
-			Midpoint:MidpointSystem,
-			ExplicitEuler:ExplicitEulerSystem,
-			ExplicitTrapezoidal:ExplicitTrapezoidal,
-			Ralston:Ralston,
-			ImplicitEulerSystem:ImplicitEulerSystem,
-			DormandPrice:DormandPrice,
-			ImplicitEulerJacobian:ImplicitEulerJacobian,
-			ImplicitMidpoint:ImplicitMidpoint,
-			ImplicitTrapezoidal:ImplicitTrapezoidal,
-			ImplicitRadauI5,ImplicitRadauI5
-		},Task.options);
+		MethodPicker.init('methodBlock',Methods,Task.options);
 		startButton=document.getElementById('startButton');
 		startButton.onclick=start;
+		startButton.value="Старт";
+		//startButton.onclick=start;
+		mainWorker.init(startButton,progressBar);
 	}
 	init();
 	//var worker;
 	function loop(timestamp)
 	{
 		var dt=timestamp-timer;
-		if(dt>10.000)
+		if(/*dt>10.000*/true)
 		{
 				if(currentTask.t0<currentTask.t1&&curPoints<maxPoints)
 				{
@@ -681,10 +661,11 @@ Main=(function()
 	}
 	function stop()
 	{
+		mainWorker.stop();
+		startButton.value="Старт";
+		startButton.onclick=start;
+		return;
 
-	cancelAnimationFrame(frameID);
-	startButton.value="Старт";
-	startButton.onclick=start;
 		//worker = undefined;
 	}
 	return {start:start,stop:stop};
