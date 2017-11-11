@@ -17,7 +17,7 @@ h1 small {
 }
 
 form {
-	position: absolute;
+	/*position: absolute;*/
 	margin-top: 5%; 
 	/*width: 50%;*/
 	margin-left: 50%;
