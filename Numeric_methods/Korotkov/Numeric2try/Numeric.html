@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>euler demo</title>
+	<script src="js/jquery-3.2.1.min.js"></script>
+	<script src="js/plotly-latest.min.js"></script>
+	<script src="js/Solver.js"></script>
+</head>
+<body>
+<h2>Numeric methods</h2>
+<div id="plot" style="width:400;height:400;"></div>
+<table>
+	  <tr>
+	    <td><label>x - coord of displacement</label></td>
+	    <td><input type="number" value="40" id="x"></td>
+	  </tr>
+  	  <tr>
+	    <td><label>m - mass </label></td>
+	    <td><input type="number" id="mass" value = "1"></td>
+	  </tr>
+  	  <tr>
+	    <td><label>k - coefficient of elasticity </label></td>
+	    <td><input type="number" id="k" value = "0.6"></td>
+	  </tr>
+  	  <tr>
+	    <td><label>t - time of simulation (s) </label></td>
+	    <td><input type="number" id="time" value = "10"></td>
+	  </tr>
+	  <tr>
+	    <td><label>step</label></td>
+	    <td><input type="number" id="step" value = "0.1"></td>
+	  </tr>
+	  <tr>
+	    <td><button id = "buttonSolve" align="middle">Calculate</button></td>
+	    <td><button id = "buttonErase" align="middle">Erase</button></td>
+	  </tr>
+	</table>
+</body>
+</html>

@@ -3,17 +3,23 @@
 <head>
 	<title>numeric</title>
 	<script src="js/jquery-3.2.1.min.js"></script>
+	<script src="js/plotly-latest.min.js"></script>
 	<script src="js/main.js"></script>
 </head>
 <body>
-	<canvas id="myCanvas" width="400" height="400" style="border:1px solid #000000;"></canvas><br>
+	
 <!-- 	<svg width="1200" height="1200">
 		<circle cx="5" cy="5" r="4" stroke="green" stroke-width="1" fill="yellow" />
 	</svg> -->
 
+<!-- 	<table>
+		<tr>
+			<td><canvas id="myCanvas" width="400" height="400" style="border:1px solid #000000;"></canvas><br></td>
+			<td><div id="tester" style="width:400;height:400;"></div></td>
+		</tr>
+	</table> -->
+	<div id="tester" style="width:400;height:400;"></div>
 	<table>
-
-
 	  <tr>
 	    <td><label> graph colour</label></td>
 		<td> 
@@ -51,8 +57,16 @@
 	    <td><input type="number" id="f" value = "2"></td>
 	  </tr>
   	  <tr>
-	    <td><label>n - number of iterations </label></td>
-	    <td><input type="number" id="n" value = "450"></td>
+	    <td><label>n - number of iterations NOT ACTIVE </label></td>
+	    <td><input type="number" id="n" value = "100"></td>
+	  </tr>
+	  <tr>
+	    <td><label>step volume</label></td>
+	    <td><input type="number" id="step" value = "0.4"></td>
+	  </tr>
+  	  <tr>
+	    <td><label>accuracy</label></td>
+	    <td><input type="number" id="accuracy" value = "0.02"></td>
 	  </tr>
 	  <tr>
 	    <td><button id = "button" align="middle">Calculate</button></td>
