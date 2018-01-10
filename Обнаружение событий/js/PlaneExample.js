@@ -66,7 +66,28 @@ function CreatePlot()
       name: 'Траектория мяча (с аппроксимацией)'
     };
 
-    var data = [trace1, trace2];
+
+    var VB = parseFloat(GetValue('Vb'));
+    var length = 8 * VB;
+    var numSteps = 5;
+    var gx = length/numSteps;
+    var y = [];
+    var x = [];
+    for (var i = 0; i < numSteps; i++)
+    {
+    	x.push(i * gx);	
+    	y.push(groundZero(i*gx, 0, 0));
+    }
+
+    var ground = {
+    	y: y,
+    	x: x,
+    	type: 'scatter',
+    	line: {shape: 'hv'},
+    	name: 'Функция поверхности'
+    };
+
+    var data = [trace1, trace2, ground];
     Plotly.newPlot('myDiv', data);
 }
 
@@ -75,8 +96,14 @@ function GetValue(value)
   return document.getElementById(value).value;
 }
 
+function Log(string)
+{
+	document.getElementById("logText").value += '\n' + string;
+}
+
 window.startDemo=function() {
 
+	Log("Начало эксперимента");
     stopped = false;
     approximate = document.getElementById("approx").checked;
     iterationCounter = 0;
@@ -87,11 +114,17 @@ window.startDemo=function() {
     var y0 = 0;
 
     var xBall = 0;
+
     var yBall =  parseFloat(parseFloat(GetValue('H')));
     var b  = parseFloat(GetValue('beta'));
     var VB = parseFloat(GetValue('Vb'));
     window.dt = GetValue('dt') * 0.001;
     
+	Log("Начальная высота: " + yBall);
+	Log("β: " + b);
+	Log("Скорость мяча: " + VB);
+	Log("Шаг итерации: " + dt);
+	Log("Аппроксимация: " + approximate)
     
     var H = yBall;
     var theta = Math.sqrt(b);
@@ -118,25 +151,28 @@ window.startDemo=function() {
         // LINEARLY APPROXIMATE HIT POSITION
         if (approximate)
         {
-          if (newYBall[0] < 0)
+        	var gy = groundZero(newXBall[0], 0, 0);
+          if (newYBall[0] < gy)
             {
+            	Log("	::Столкновение::");
+            	Log("X: " + oldX + "Y: " + oldY);
                 var newX = newXBall[0];
                 var oldX = xBall;
                 var newY = newYBall[0];
                 var oldY = yBall;
   
-                var dy = (0 - newY);
+                var dy = (gy - newY);
                 var tan = (newX - oldX)/(newY - oldY);
                 var dx = tan * dy;
   
                 // HIT POSITION: [x-dx, 0]
                 newXBall[0] = newXBall[0] + dx;
-                newYBall[0] = 0;
+                newYBall[0] = gy;
   
                 // APPROXIMATE BOUNCE ANGLE
                 newYBall[1] = Math.sqrt(2*9.8*H - VB*VB) * theta;
                 theta = theta * b;
-                console.log(newYBall[1]);
+                Log("	Новая скорость по y: " + newYBall[1]);
   
               beenOver = false;
             }
@@ -150,7 +186,7 @@ window.startDemo=function() {
         // WITHOUT APPROXIMATION4
         if (!approximate)
         {
-          if (yBall < 0 && beenOver)
+          if (yBall < groundZero(newXBall[0], 0, 0) && beenOver)
           {
             beenOver = false;
             v0[1] = -v0[1]*theta;
@@ -166,7 +202,7 @@ window.startDemo=function() {
         if (Math.round(v0[1]) == 0 && yBall <= 0 && !beenOver)
         {
           clearInterval(window.interval);
-          alert("Моделирование завершено");
+          Log("Моделирование завершено");
           animating = false;
           stopped = true;
         } 
@@ -193,4 +229,17 @@ function animate() {
     Plotly.extendTraces("myDiv", update, [1]);
   else
     Plotly.extendTraces("myDiv", update, [0]);
+}
+
+
+// -- GROUND FUNCTIONS
+function groundZero(x, length, param) 
+{
+	// y = 0
+	return param;
+}
+
+function groundSteps(x, length, height, dy)
+{
+	return height - Math.floor(x / length)*dy;
 }

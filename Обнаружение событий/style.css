@@ -16,6 +16,13 @@ h1 small {
 	font-family: 'Source Sans Pro', sans-serif;
 }
 
+textarea {
+	position: absolute;
+	width:  40%;
+	margin-left: 5%;
+	margin-top: 5%;
+}
+
 form {
 	/*position: absolute;*/
 	margin-top: 5%; 
