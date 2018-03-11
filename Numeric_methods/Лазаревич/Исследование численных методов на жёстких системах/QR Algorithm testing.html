@@ -1,0 +1,137 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Решатели - осциллятор Ван дер Поля</title>
+	<link rel="stylesheet" type="text/css" href="./css/reset.css">
+	<link rel="stylesheet" type="text/css" href="./css/solvers.css">
+	<script type="text/javascript" src="http://latex.codecogs.com/latexit.js"></script>
+</head>
+<body>
+	<form id="form" onsubmit="return false;">
+		<label >Размер матрицы</label>
+	<input id="size" type="number" min="1" max="8" step="1" value="3" onchange="rebuild()">
+	<input id="iterations" type="number" min="20" value="200" max="1000">
+	<div id="matrix">
+	</div>
+	<button onclick="getEigenvalues()">get eigenvalues</button>
+	<div id="result"></div>
+	</form>
+</body>
+	<script src="./js/methods.js"></script>
+	<script>
+		//from MDN
+		function decimalAdjust(type, value, exp) {
+		    // Если степень не определена, либо равна нулю...
+		    if (typeof exp === 'undefined' || +exp === 0) {
+		      return Math[type](value);
+		    }
+		    value = +value;
+		    exp = +exp;
+		    // Если значение не является числом, либо степень не является целым числом...
+		    if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0)) {
+		      return NaN;
+		    }
+		    // Сдвиг разрядов
+		    value = value.toString().split('e');
+		    value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp)));
+		    // Обратный сдвиг
+		    value = value.toString().split('e');
+		    return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
+		  }
+
+		  // Десятичное округление к ближайшему
+		  if (!Math.round10) {
+		    Math.round10 = function(value, exp) {
+		      return decimalAdjust('round', value, exp);
+		    };
+		  }
+
+
+
+		function getEigenvalues()
+		{
+			var form=document.getElementById("form");
+			if(!form.reportValidity())
+					return;
+			var sizeInput=document.getElementById("size");
+			var Rank=parseFloat(sizeInput.value);
+			var matrix=new Array(Rank*Rank);
+			for(var i=0;i<matrix.length;i++)
+				matrix[i]=0;
+			var HTMLmatrix=document.getElementById('matrix');
+			var input="eigenvalues {";
+			for(var i=0;i<Rank;i++)
+			{
+				var child=HTMLmatrix.children[i];
+				input+="{";
+				for(var j=0;j<Rank;j++)
+				{
+					matrix[i*Rank+j]=parseFloat(child.children[j].value);
+					input+=matrix[i*Rank+j];
+					if(j!=Rank-1)
+						input+=",";
+				}
+				input+="}";
+				if(i<Rank-1)
+					input+=",";
+			}
+			input+="}"
+			var iters=document.getElementById("iterations");
+			var eigenvalues=QRAlgorithm(matrix,Rank,parseFloat(iters.value));
+			var res=document.getElementById("result");
+			res.innerHTML="";
+			res.innerHTML=JSON.stringify(eigenvalues);
+			res.innerHTML+="<br>";
+			res.innerHTML+="Wolfram request: "+input;
+			
+		}
+
+
+
+		window.addEventListener("load",rebuild,false);
+		var rank=0;
+		function rebuild()
+		{
+			var form=document.getElementById("form");
+			if(!form.reportValidity())
+					return;
+			var sizeInput=document.getElementById("size");
+			var newRank=parseFloat(sizeInput.value);
+			var matrix=document.getElementById('matrix');
+			for(var i=matrix.children.length;i>newRank;i--)
+			{
+				matrix.removeChild(matrix.children[i-1]);
+			}
+			for(var i=0;i<matrix.children.length;i++)
+			{
+				var child=matrix.children[i];
+				for(var j=child.children.length;j>newRank;j--)
+				{
+					child.removeChild(child.children[j-1]);
+				}
+				for(var j=child.children.length;j<newRank;j++)
+				{
+					var input=document.createElement('input');
+					input.type="number";
+					input.value=Math.round10(Math.random()*2.5+0.5,-2);
+					input.step="any";
+					child.appendChild(input);
+				}
+			}
+			for(var i=matrix.children.length;i<newRank;i++)
+			{
+				var div=document.createElement("div");
+				div.style="display:flex;flex-direction:row";
+				for(var j=0;j<newRank;j++)
+				{
+					var input=document.createElement('input');
+					input.type="number";
+					input.value=Math.round10(Math.random()*2.5+0.5,-2);
+					input.step="any";
+					div.appendChild(input);
+				}
+				matrix.appendChild(div);
+			}
+		}
+	</script>
+</html>

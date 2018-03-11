@@ -1,0 +1,400 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Решатели - новый интерфейс</title>
+	<link rel="stylesheet" type="text/css" href="./css/reset.css">
+	<link rel="stylesheet" type="text/css" href="./css/new_interface.css">
+	<script type="text/javascript" src="http://latex.codecogs.com/latexit.js"></script>
+	<script>
+		var TabObserver=(function(){
+			var tabs=new Array();
+			var links=new Array();
+			function Init()
+			{
+				function setTab()
+				{
+					tabs.forEach(function(item)
+					{
+						item.classList.remove('activeTabContent');
+					});
+					links.forEach(function(item)
+					{
+						item.classList.remove('activeTabLink');
+					})
+					this.classList.add('activeTabLink');
+					tabs[this.getAttribute('tabLinkId')].classList.add('activeTabContent');
+				}
+				var links_t=document.getElementsByClassName("tabLink");
+
+				if(links_t.Length!=0)
+				{
+					for(var i=0;i<links_t.length;i++)
+					{
+						var t=document.getElementById(links_t[i].getAttribute('tabLink'));
+						if(t!=null)
+						{
+							tabs.push(t);
+							links_t[i].setAttribute('tabLinkId',tabs.length-1);
+							links_t[i].onclick=setTab;
+							links.push(links_t[i]);
+						}
+					}
+					links[0].click();
+				}
+			}
+			return {init:Init};
+		})();
+
+		window.addEventListener('load',TabObserver.init,false);
+		/*
+		Very important!!
+		Calc max (t1-t0):
+		((50 MB/8B(float 64bit))*1/4(4 methods max)*1/(varNumbers+1))*(minstep(1 ms for this example))
+		50*2^20*0.001/(2^3*2^2*3)=546 seconds
+		*/
+		function show()
+		{
+
+
+		}
+		function hide()
+		{
+
+
+
+
+		}
+		function toogle(element)
+		{
+			var oldHeight = element.clientHeight;
+			if(element.style.display!=='none')
+			{
+				var newHeight=0;
+				//element.style.height=newHeight;
+
+				/* element.animate({height: newHeight}, 'fast', function() {
+				 		element.style.display='none';
+				        element.style.height='auto';
+				    });*/
+
+				}else
+				{
+					var newHeight=element.clientHeight;
+					element.style.height=0;
+					element.style.removeProperty('display');
+				/*element.animate({height: newHeight}, 'fast', function() {
+				        element.style.height='auto';
+				    });
+				    */
+				}
+			}
+
+
+
+
+
+		</script>
+	</head>
+	<body>
+		<div class="hideableBlock">
+			<input type="checkbox" class="hideableCheckbox" id="c1">
+			<label class="hideableCheckboxLabel" for="c1">
+				<div class="hideableHeader">
+					Методы и параметры<br>
+				</div>
+			</label>
+			<div class="hideableBody">
+				<div id="methodsBlock" style="height:auto;border:1px solid black;display:flex;margin:5px">
+					<div id="methodsCreation" style="border:1px solid black;/*display:table*/">
+
+						<label style="display:block;white-space:nowrap;text-align:center;margin:5px auto;">Выбор методов</label>
+						<div style="display:table;border-spacing:5px;border: 1px solid black;margin: auto;">
+							<div class="table_row">
+								<label class="table_label">Метод</label>
+								<select class="table_input" class="method_select"></select>
+							</div>
+							<div class="table_row">
+								<label class="table_label">Шаг, мс</label>
+								<input class="table_input" type="number" value="20" step="1" min="1" max="1000">
+							</div>
+							<div class="table_row">
+								<label class="table_label">Цвет</label>
+								<input class="table_input" type="color" value="#0000FF">
+							</div>
+							<div class="table_row_group">
+								<div class="table_row">
+									<label class="table_label">Максимальный шаг, мс</label>
+									<input class="table_input" type="number" value="20" step="1" min="1" max="1000">
+								</div>
+								<div class="table_row">
+									<label class="table_label">Допустимая ошибка</label>
+									<input class="table_input" type="number" value="0.001" step="any" min="0.0001" max="10">
+								</div>
+							</div>
+							<div class="table_row_group">
+								<div class="table_row">
+									<label class="table_label">Порядок метода</label>
+									<select class="table_input"></select>
+								</div>
+							</div>
+							<div class="table_row_group">
+								<div class="table_row">
+									<label class="table_label">Матрица Якоби</label>
+									<select class="table_input">
+										<option>
+											Аналитическая
+										</option>
+										<option>
+											Приближённая
+										</option>
+									</select>
+								</div>
+								<div class="table_row">
+									<label class="table_label">Константная матрица</label>
+									<input type="checkbox" class="table_input">
+								</div>
+							</div>
+						</div>
+						<button id="methodAddButton" style="display:block;margin:5px auto;">Добавить</button>
+					</div>
+					<div id="methodsStack" style=" display:table-cell;width:100%;border:1px solid black">
+						<div class="methodBlock" style="border:1px solid black;display:table">
+							<div class="methodBlockHeader">
+								<div class="methodBlockColor" style="background-color:red;width:20px;height:20px;float:left">
+								</div>
+								<label id="methodBlockName">Метод Александра Мокидонского
+								</label>
+								<div id="methodBlockRemove">
+								</div>
+							</div>
+							<div class="methodBlockBody">
+								<div style="display:table;border-spacing:5px;border: 1px solid black;margin: auto;">
+									<div class="table_row">
+										<label class="table_label">Метод</label>
+										<select class="table_input" class="method_select"></select>
+									</div>
+									<div class="table_row">
+										<label class="table_label">Шаг, мс</label>
+										<input class="table_input" type="number" value="20" step="1" min="1" max="1000">
+									</div>
+									<div class="table_row">
+										<label class="table_label">Цвет</label>
+										<input class="table_input" type="color" value="#0000FF">
+									</div>
+									<div class="table_row_group">
+										<div class="table_row">
+											<label class="table_label">Максимальный шаг, мс</label>
+											<input class="table_input" type="number" value="20" step="1" min="1" max="1000">
+										</div>
+										<div class="table_row">
+											<label class="table_label">Допустимая ошибка</label>
+											<input class="table_input" type="number" value="0.001" step="any" min="0.0001" max="10">
+										</div>
+									</div>
+									<div class="table_row_group">
+										<div class="table_row">
+											<label class="table_label">Порядок метода</label>
+											<select class="table_input"></select>
+										</div>
+									</div>
+									<div class="table_row_group">
+										<div class="table_row">
+											<label class="table_label">Матрица Якоби</label>
+											<select class="table_input">
+												<option>
+													Аналитическая
+												</option>
+												<option>
+													Приближённая
+												</option>
+											</select>
+										</div>
+										<div class="table_row">
+											<label class="table_label">Константная матрица</label>
+											<input type="checkbox" class="table_input">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="methodBlock" style="border:1px solid black;display:table">
+							<div class="methodBlockHeader">
+								<div class="methodBlockColor" style="background-color:red;width:20px;height:20px;float:left">
+								</div>
+								<label id="methodBlockName">Метод Серёжи Картавого
+								</label>
+								<div id="methodBlockRemove">
+								</div>
+							</div>
+							<div class="methodBlockBody">
+								<div style="display:table" style="width:20px;height:20px">
+									<div class="table_row">
+										<label class="table_label">Название метода</label>
+										<input class="table_input"></input>
+									</div>
+									<div class="table_row">
+										<label class="table_label">Название метода</label>
+										<input class="table_input"></input>
+									</div>
+									<div class="table_row">
+										<label class="table_label">Название метода</label>
+										<input class="table_input"></input>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="methodBlock" style="border:1px solid black;display:table">
+							<div class="methodBlockHeader">
+								<div class="methodBlockColor" style="background-color:red;width:20px;height:20px;float:left">
+								</div>
+								<label id="methodBlockName">Метод Жана Карабаса
+								</label>
+								<div id="methodBlockRemove">
+								</div>
+							</div>
+							<div class="methodBlockBody">
+								<div style="display:table" style="width:20px;height:20px">
+									<div class="table_row">
+										<label class="table_label">Название метода</label>
+										<input class="table_input"></input>
+									</div>
+									<div class="table_row">
+										<label class="table_label">Название метода</label>
+										<input class="table_input"></input>
+									</div>
+									<div class="table_row">
+										<label class="table_label">Название метода</label>
+										<input class="table_input"></input>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			<!-- Параметры
+			-->
+			<!-- Пресеты
+			-->
+			<div id="Presets">
+				<div class="PresetAdd">
+					<div>
+						<label>Название пресета</label>
+						<input ></input>
+					</div>
+						<button>Сохранить текущие параметры</button>
+				</div>
+				<div id="PresetList">
+						<div class="Preset" id="PresetExample" style="display:none">
+							<label class="PresetName"></label>
+							<div class="PresetMethods">
+								<div class="PresetMethod">Метод 1
+								</div>
+							</div>
+							<div class="PresetParams">
+								<div class="PresetParam">Параметр 1: значение</div>
+							</div>
+							<button >Загрузить</button>
+							<button >Удалить</button>
+						</div>
+						<div class="Preset">
+							<label>Название</label>
+							<div class="PresetMethods">
+								<div class="PresetMethod">Метод 1
+								</div>
+								<div class="PresetMethod">Метод 2
+								</div>
+								<div class="PresetMethod">Метод 3
+								</div>
+							</div>
+							<div class="PresetParams">
+								<div class="PresetParam">Параметр 1: значение</div>
+								<div class="PresetParam">Параметр 2: значение</div>
+							</div>
+							<button >Загрузить</button>
+							<button >Удалить</button>
+						</div>
+						<div class="Preset">
+							<label>Название</label>
+							<div class="PresetMethods">
+								<div class="PresetMethod">Метод 1
+								</div>
+								<div class="PresetMethod">Метод 2
+								</div>
+							</div>
+							<div class="PresetParams">
+								<div class="PresetParam">Параметр 1: значение</div>
+								<div class="PresetParam">Параметр 2: значение</div>
+							</div>
+							<button style="margin-top:auto;/*костыль для выравнивания кнопок к концу блока*/">Загрузить</button>
+							<button >Удалить</button>
+						</div>
+				</div>
+			</div>
+		</div>
+		</div>
+		<div class="hideableBlock">
+			<input type="checkbox" class="hideableCheckbox" id="c2">
+			<label class="hideableCheckboxLabel" for="c2">
+				<div class="hideableHeader">
+					Задача<br>
+				</div>
+			</label>
+			<div class="hideableBody">
+				<div id="taskBlock">
+					<div id="taskDescription">
+						Здесь находится описание<br>
+						формулы делаются следующим образом:
+						<div lang="latex">
+							\frac{1+sin(x)}{y}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="hideableBlock">
+			<input type="checkbox" class="hideableCheckbox" id="c3">
+			<label class="hideableCheckboxLabel" for="c3">
+				<div class="hideableHeader">
+					Расчёт<br>
+				</div>
+			</label>
+			<div class="hideableBody">
+			<!--   
+				Непосредственные графики переменных(1-n)
+				График ошибки(1)
+				возможно График оценки жёсткости(1)
+				количество вычислений правых частей обращений матрицы
+
+
+
+			-->
+
+			<input id="startButton" type="button" value="Старт"></input>
+
+			<div style="width:100%;box-sizing:border-box;padding:5px;">
+				<progress id="progressBar" style="width:100%" value='0' max="100"></progress>
+			</div>
+			<div class="tab">
+				<button class="tabLink" tabLink="solutions" style="flex-grow:1">Графики решения</button>
+				<button class="tabLink" tabLink="stiffness" style="flex-grow:1">График оценки жёсткости</button>
+				<button class="tabLink" tabLink="complexity" style="flex-grow:1">Вычислительная сложность и размера шага</button>
+			</div>
+			<div class="tabContainter">
+			<div id="solutions" class="tabContent" style="min-height: 50px">
+				<div class="ocheBolshoyDiv" style="min-width:100px">1</div>
+			</div>
+			<div id="stiffness" class="tabContent" style="min-height: 50px">
+				<div class="ocheBolshoyDiv" style="min-width:100px">2</div>
+			</div>
+			<div id="complexity" class="tabContent" style="min-height: 50px">
+				<div class="ocheBolshoyDiv" style="min-width:100px">3</div>
+			</div>
+			</div>
+
+		</div>
+	</div>
+	<div id="graphBlock">
+		<div id="graph" style="width:600px;height:250px;"></div>
+	</div>
+</body>
+</html>

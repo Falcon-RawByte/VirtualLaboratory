@@ -87,11 +87,13 @@ Task=(function()
 			taskBlock.style.display='block';
 			taskModel=(function()
 			{
-				var parameters=[{name:'u',description:'Параметр \u03bc',default:0,step:'0.1'}];
+				var parameters=[{name:'u',description:'Параметр \u03bc',default:20,step:'0.1'}];
 				var values=[{name:'x',description:'Начальная позиция',default:1},{name:"x'",description:'Начальная скорость',default:0}];//x,x'
 				var argument=[{name:'t',description:'Начальное время',default:0},{name:'dt',description:'Продолжительность',default:10,min:0}];
 				//var plot=[{x:'t',y:'x'},{x:'x',y:"x'"}];
 				var plot=[{x:{index:values.length,description:'Время'},y:{index:0,description:'Значение X'},description:'График изменения x'},{x:{index:0,description:'Значение X'},y:{index:1,description:"Значения X'"},description:'Фазовый портрет'}];
+				var taskInfo={name:'Осциллятор Ван-дер-Поля',description:'Здесь должно быть описание задачи'};
+				var presets=[{name:'Preset 1',values:[5,4],parameters:[50]},{name:'Preset 2',values:[0,1],parameters:[20]}];
 				function getFunctions(parameters)
 				{
 					var functions=new Array(2);
@@ -135,7 +137,7 @@ Task=(function()
 					];
 					return jacobian;
 				};
-					return {parameters:parameters,values:values,argument:argument,plot:plot,getFunctions:getFunctions,getJacobian:getJacobian};
+					return {presets:presets,parameters:parameters,values:values,argument:argument,plot:plot,getFunctions:getFunctions,getJacobian:getJacobian};
 				})();
 				/*taskModel.values.forEach(function(item)
 				{
@@ -150,6 +152,40 @@ Task=(function()
 				{
 					parametersInputs.push(valueInput(item));
 				});*/
+				//var taskDescription=document.createElement('div');
+				//taskDescription.id="taskDescription";
+				var presets=document.createElement('div');
+				presets.id="presets";
+				taskModel.presets.forEach(function(item,i)
+				{
+					var div=document.createElement('div');
+					var label=document.createElement('div');
+					label.appendChild(document.createTextNode(item.name));
+					div.appendChild(label);
+					var btn=document.createElement('input');
+					btn.type='button';
+					btn.value='Применить';
+					btn.class='presetBtn';
+					div.className='presetDiv';
+					div.style.display="inline-block";
+					div.style.margin='5px';
+					btn.onclick=function()
+					{
+						item.parameters.forEach(function(item2,j)
+						{
+							parametersTable.inputs[j].value=item2;
+						});
+						item.values.forEach(function(item2,j)
+						{
+							initialValuesTable.inputs[j].value=item2;
+						});
+
+					}
+					div.appendChild(btn);
+					presets.appendChild(div);
+
+				});
+				taskBlock.appendChild(presets);
 				initialValuesTable=createInputsTable('taskBlock',taskModel.values,'Начальные значения',taskModel.argument);
 				parametersTable=createInputsTable('taskBlock',taskModel.parameters,'Параметры');
 				function createPlot(divId,plotArray,values,argument)
@@ -589,9 +625,22 @@ Main=(function()
 
 		startButton.value="Стоп";
 		startButton.onclick=stop;
+
+		var complexity=document.getElementById("complexity");
+		complexity.innerHTML="";
 		mainWorker.start(data,solvers,function(data,solver,index){
 			Task.drawPlot(data,index,solver.method.method.attributes.name,solver.color);
-		},stop);
+		},stop,function(data,solver)
+		{
+			var div=document.createElement("div");
+			div.appendChild(document.createTextNode(solver.method.method.attributes.name));
+			div.appendChild(document.createElement('br'));
+			div.appendChild(document.createTextNode("right sides: "+data.rightSideEvaluation));
+			div.appendChild(document.createElement('br'));
+			div.appendChild(document.createTextNode("matrix solvings: "+data.matrixSolving));
+			complexity.appendChild(div);
+
+		});
 		return;
 	}
 	var tasks;

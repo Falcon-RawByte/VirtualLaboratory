@@ -4,7 +4,7 @@ InitMethods=function(){
 		{
 			var rang=y.length;
 			var x=new Array(rang);
-			epsilon=0.01
+			epsilon=0.001
 			function index(i,j)
 			{
 				return i*rang + j;
@@ -47,7 +47,6 @@ InitMethods=function(){
 						matrix[index(indexes[i],k)] = matrix[index(indexes[i],k)] - matrix[index(indexes[i],l)] * matrix[index(indexes[l],k)];
 					y[indexes[i]] = y[indexes[i]] - matrix[index(indexes[i],l)] * y[indexes[l]];
 					matrix[index(indexes[i],l)] = 0;
-
 				}
 			}
 			x[rang - 1] = y[indexes[rang - 1]];
@@ -281,12 +280,12 @@ InitMethods=function(){
 			3/40,9/40,
 			44/45,-56/15, 32/9,
 			19372/6561,-25360/2187, 64448/6561,-212/729,
-			9017/3168,-355/33, -46732/5247,49/176,-5103/18656,
+			9017/3168,-355/33, 46732/5247,49/176,-5103/18656,
 			35/384,0,500/1113,125/192,-2187/6784,11/84
 			];
 			var b1=[35/384,0,500/1113,125/192,-2187/6784,11/84];
 			var b2=[5179/57600,0,7571/16695,393/640,-92097/339200,187/2100,1/40];
-			var c=[0,1/5,3/10,4/5,8/9,1,1];
+			var c=[1/5,3/10,4/5,8/9,1,1];
 			var kdiff=[71/57600,0,-71/16695,71/1920,-17253/339200,22/525,-1/40];
 
 			var step=0;
@@ -310,110 +309,116 @@ InitMethods=function(){
 					this.Step=AutoStep;
 				}
 			}
-				function AutoStep(data)
-				{
-						var count=data.xv.length;
-						var k=new Array(7);
+			function AutoStep(data)
+			{
+					var count=data.xv.length;
+					var k=new Array(7);
+					for(var i=0;i<7;i++)
+					{
+						k[i]=new Array(count);
+					}
+					var ktemp=data.xv.slice();
+					var aIterator=0;
+					var t_i=data.t;
+					for(var i=0;i<6;i++)
+					{
+						for(var j=0;j<count;j++)
+							k[i][j]=funcs[j](ktemp,t_i)*step;
+						var tIterator=aIterator;
+						for(var j=0;j<count;j++)
+						{
+							aIterator=tIterator;
+							var temp=0;
+							for(var l=0;l<=i;l++)
+							{
+								temp+=a[aIterator]*k[l][j];
+								aIterator++;
+							}
+							ktemp[j]=temp+data.xv[j];
+						}
+						t_i=data.t+c[i]*step;
+						console.log('ktemp '+ktemp);
+					}
+					for(var j=0;j<count;j++)
+						k[6][j]=funcs[j](ktemp,t_i)*step;
+					var difference=0;
+					for(var j=0;j<count;j++)//find max norm |x|=max(x(j)), j=1,n
+					{	
+						var tempDifference=0;
 						for(var i=0;i<7;i++)
 						{
-							k[i]=new Array(count);
+							tempDifference+=kdiff[i]*k[i][j];
 						}
-						var ktemp=data.xv.slice();
-						var aIterator=0;
-						var t_i;
-						for(var i=0;i<6;i++)
-						{
-							t_i=data.t+c[i]*step;
-							for(var j=0;j<count;j++)
-								k[i][j]=funcs[j](ktemp,t_i)*step;
-							var tIterator=aIterator;
-							for(var j=0;j<count;j++)
-							{
-								aIterator=tIterator;
-								for(var l=0;l<=i;l++)
-								{
-									var temp=0;
-									temp+=a[aIterator]*k[l][j];
-									aIterator++;
-								}
-								ktemp[j]=temp+data.xv[j];;
-							}
-						}
-						t_i=data.t+c[6]*step;
-						for(var j=0;j<count;j++)
-							k[6][j]=funcs[j](ktemp,t_i)*step;
-						var difference=0;
-						for(var j=0;j<count;j++)//find max norm |x|=max(x(j)), j=1,n
-						{	
-							var tempDifference=0;
-							for(var i=0;i<7;i++)
-							{
-								tempDifference+=kdiff[i]*k[i][j];
-							}
-							tempDifference=Math.abs(tempDifference);
-							difference=Math.max(difference,tempDifference);
-						}
-						var stepOpt=Math.pow(errorTolerance*step*0.5/difference,0.20)*step;
-						stepOpt=Math.min(Math.max(minStep,stepOpt),maxStep);
-						//console.log(stepOpt);
-						if(stepOpt*2<step)
-						{
-							step=stepOpt;
-							Step(data);
-							return;
-						}else
-						{
-							for(var i=0;i<6;i++)
-							{
-								for(var j=0;j<count;j++)
-									data.xv[j]+=k[i][j]*b1[i];
-							}
-						}
-						data.t+=step;
+						tempDifference=Math.abs(tempDifference);
+						difference=Math.max(difference,tempDifference);
+					}
+					var stepOpt=Math.pow(errorTolerance*step*0.5/difference,0.20)*step;
+					console.log(stepOpt);
+					if(isNaN(stepOpt))
+					{
+						stepOpt=minStep;
+					}
+					stepOpt=Math.min(Math.max(minStep,stepOpt),maxStep);
+					console.log(stepOpt);
+					console.log(data.xv);
+					console.log(difference);
+					if(stepOpt*2<step)
+					{
 						step=stepOpt;
-				}
-				function Step(data)
-				{
-						var count=data.xv.length;
-						var k=new Array(6);
-						for(var i=0;i<6;i++)
-						{
-							k[i]=new Array(count);
-						}
-						var ktemp=data.xv.slice();
-						var aIterator=0;
-						var t_i;
-						for(var i=0;i<5;i++)
-						{
-							t_i=data.t+c[i]*step;
-							for(var j=0;j<count;j++)
-								{
-									k[i][j]=funcs[j](ktemp,t_i)*step;
-								}
-							var tIterator=aIterator;
-							for(var j=0;j<count;j++)
-							{
-								aIterator=tIterator;
-								var temp=0;
-								for(var l=0;l<=i;l++)
-								{
-									temp+=a[aIterator]*k[l][j];
-									aIterator++;
-								}
-								ktemp[j]=temp+data.xv[j];
-							}
-						}
-						t_i=data.t+c[5]*step;
-						for(var j=0;j<count;j++)
-							k[5][j]=funcs[j](ktemp,t_i)*step;
+						Step(data);
+						return;
+					}else
+					{
 						for(var i=0;i<6;i++)
 						{
 							for(var j=0;j<count;j++)
 								data.xv[j]+=k[i][j]*b1[i];
 						}
-						//console.log(data.xv);
-						data.t+=step;
-				}
+					}
+					data.t+=step;
+					step=stepOpt;
+			}
+			function Step(data)
+			{
+					var count=data.xv.length;
+					var k=new Array(6);
+					for(var i=0;i<6;i++)
+					{
+						k[i]=new Array(count);
+					}
+					var ktemp=data.xv.slice();
+					var aIterator=0;
+					var t_i=data.t;
+					for(var i=0;i<5;i++)
+					{
+						for(var j=0;j<count;j++)
+							{
+								k[i][j]=funcs[j](ktemp,t_i)*step;
+							}
+						var tIterator=aIterator;
+						for(var j=0;j<count;j++)
+						{
+							aIterator=tIterator;
+							var temp=0;
+							for(var l=0;l<=i;l++)
+							{
+								temp+=a[aIterator]*k[l][j];
+								aIterator++;
+							}
+							ktemp[j]=temp+data.xv[j];
+						}
+						t_i=data.t+c[i]*step;
+					}
+					for(var j=0;j<count;j++)
+						k[5][j]=funcs[j](ktemp,t_i)*step;
+					for(var i=0;i<6;i++)
+					{
+						for(var j=0;j<count;j++)
+							data.xv[j]+=k[i][j]*b1[i];
+					}
+					//console.log(data.xv);
+					data.t+=step;
+			}
 			return {Step:Step,Init:Init,attributes:{name:'Метод Дорманда-Принса 5 порядка'},options:['autoStep']};
 			})();
 
@@ -485,7 +490,7 @@ InitMethods=function(){
 						}
 						last_f_difference=f_difference;
 					}
-					if(f_difference<0.01)
+					if(f_difference<0.001)
 					{
 						break;
 					}
@@ -518,10 +523,10 @@ InitMethods=function(){
 					y_difference=0;//max norm for dy
 					for(var i=0;i<count;i++)
 					{
-						y_difference=Math.max(dy[i],y_difference);
+						y_difference=Math.max(Math.abs(dy[i]),y_difference);
 						y[i]+=dy[i];
 					}
-					if(dy<0.01)
+					if(y_difference<0.001)
 					{
 						break;
 					}
@@ -750,7 +755,7 @@ InitMethods=function(){
 						}
 						last_f_difference=f_difference;
 					}
-					if(f_difference<0.01)
+					if(f_difference<0.001)
 					{
 						break;
 					}
@@ -983,8 +988,12 @@ InitMethods=function(){
 	})();
 	
 
+	BackwardDifferentiatinon2=(function(){
 
 
+
+		return{} ;
+	})();
 
 
 

@@ -1,4 +1,6 @@
 
+
+
 .table_label
 {
 display:table-cell;
@@ -21,21 +23,6 @@ text-align:right;
 	margin:auto;
 
 }
-.optionBlock
-{
-	display:table-row-group;
-	margin:auto;
-}
-.optionBlock[disabled]
-{
-	display:table-row-group;
-	margin:auto;
-    pointer-events:none;
-}
-.optionBlock[disabled] input,.optionBlock[disabled] select
-{
-	background:gray;
-}
 
 #graph
 {
@@ -48,7 +35,6 @@ text-align:right;
 	border: 1px solid black;
 	padding: 5px;
 	margin: 5px;
-	vertical-align:top;
 }
 
 #addMethodButton, .removeMethodButton
