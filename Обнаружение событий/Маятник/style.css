@@ -60,6 +60,10 @@ label {
 	width: 25%;
 }
 
+.Plotly {
+	width: 500px;
+}
+
 .orange {
 	color: #FF852C;
 }

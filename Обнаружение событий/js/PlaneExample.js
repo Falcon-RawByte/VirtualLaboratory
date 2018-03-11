@@ -5,6 +5,29 @@ var Ball = [0,0];
 var lastX = 0;
 var stopped = false;
 
+var lastVertex = [];
+var approximationModels = {
+  'none' :      { index: 0, name:"Траектория мяча"},
+  'linear' :    { index: 1, name:"Траектория мяча (с линейной ап.)"},
+  'quadratic' : { index: 2, name:"Траектория мяча (с квадратичной ап.)"},
+  'dt' :        { index: 3, name:"Траектория мяча (с переменным шагом)"}
+}
+
+
+window.toggleDemo = function()
+{
+  if (stopped)
+  {
+    startDemo();
+    document.getElementById('DemoButton').innerText = "Остановить моделирование";
+  }
+  else
+  {
+    stopDemo();
+    document.getElementById('DemoButton').innerText = "Начать Моделирование";
+  }
+}
+
 window.stopDemo=function()
 {
   stopped = true;
@@ -15,6 +38,7 @@ window.onload = window.onresize = function() {
     cv = document.getElementById('myDiv');
     cv.width = document.body.clientWidth*0.95; //document.width is obsolete
     cv.height = document.body.clientHeight * 0.7; //document.height is obsolete
+    CreatePlot();
 }
 
 function getAnalyticalPoints(b, VB, xBall, yBall)
@@ -47,7 +71,9 @@ function getAnalyticalPoints(b, VB, xBall, yBall)
       name: 'Аналитические экстремумы'
     }
     var data = [trace];
-    Plotly.addTraces('myDiv', data);
+    
+    Plotly.deleteTraces("myDiv", [-1]);
+    Plotly.addTraces("myDiv", data);
 }
 
 function CreatePlot()
@@ -63,7 +89,22 @@ function CreatePlot()
       x: [Ball[0]],
       y: [Ball[1]],
       type: 'scatter',
-      name: 'Траектория мяча (с аппроксимацией)'
+      name: 'Траектория мяча (с линейной ап.)'
+    };
+
+
+    var trace3 = {
+      x: [Ball[0]],
+      y: [Ball[1]],
+      type: 'scatter',
+      name: 'Траектория мяча (с квадратичной ап.)'
+    };
+
+    var trace4 = {
+      x: [Ball[0]],
+      y: [Ball[1]],
+      type: 'scatter',
+      name: 'Траектория мяча (с переменным шагом)'
     };
 
 
@@ -87,25 +128,39 @@ function CreatePlot()
     	name: 'Функция поверхности'
     };
 
-    var data = [trace1, trace2, ground];
+    var analytical = {
+      x : x,
+      y : y,
+      mode: 'markers',
+      type: 'scatter',
+      name: 'Аналитические экстремумы'
+    }
+
+    var data = [trace1, trace2, trace3, trace4, ground, analytical];
     Plotly.newPlot('myDiv', data);
 }
 
-function GetValue(value)
+function RecreatePlot()
 {
-  return document.getElementById(value).value;
-}
-
-function Log(string)
-{
-	document.getElementById("logText").value += '\n' + string;
+  var trace = {
+    x: [Ball[0]],
+    y: [Ball[1]],
+    type: 'scatter',
+    name: approximationModels[approximate].name
+  };
+  
+    Plotly.deleteTraces("myDiv", [approximationModels[approximate].index]);
+    Plotly.addTraces("myDiv", trace);
+    Plotly.moveTraces("myDiv", -1, approximationModels[approximate].index);
 }
 
 window.startDemo=function() {
 
 	Log("Начало эксперимента");
     stopped = false;
-    approximate = document.getElementById("approx").checked;
+    
+    approximate = document.querySelector('input[name="approx"]:checked').value;
+
     iterationCounter = 0;
 
     var beenOver = true;
@@ -118,7 +173,9 @@ window.startDemo=function() {
     var yBall =  parseFloat(parseFloat(GetValue('H')));
     var b  = parseFloat(GetValue('beta'));
     var VB = parseFloat(GetValue('Vb'));
-    window.dt = GetValue('dt') * 0.001;
+
+    var originaldT = GetValue('dt');
+    window.dt = originaldT * 0.001;
     
 	Log("Начальная высота: " + yBall);
 	Log("β: " + b);
@@ -130,8 +187,9 @@ window.startDemo=function() {
     var theta = Math.sqrt(b);
     var v0 = [VB, 0];
     Ball = [xBall, yBall];
+    lastVertex = [xBall, yBall];
 
-    CreatePlot();
+    RecreatePlot();
     getAnalyticalPoints(b, VB, xBall, yBall);
     b = theta;
 
@@ -149,13 +207,11 @@ window.startDemo=function() {
         }), window.dt);
 
         // LINEARLY APPROXIMATE HIT POSITION
-        if (approximate)
+        if (approximate == "linear")
         {
         	var gy = groundZero(newXBall[0], 0, 0);
           if (newYBall[0] < gy)
             {
-            	Log("	::Столкновение::");
-            	Log("X: " + oldX + "Y: " + oldY);
                 var newX = newXBall[0];
                 var oldX = xBall;
                 var newY = newYBall[0];
@@ -168,6 +224,9 @@ window.startDemo=function() {
                 // HIT POSITION: [x-dx, 0]
                 newXBall[0] = newXBall[0] + dx;
                 newYBall[0] = gy;
+
+            	  Log("	::Столкновение::");
+            	  Log("X: " + newXBall[0] + "Y: " + newYBall[0]);
   
                 // APPROXIMATE BOUNCE ANGLE
                 newYBall[1] = Math.sqrt(2*9.8*H - VB*VB) * theta;
@@ -178,14 +237,59 @@ window.startDemo=function() {
             }
         }
 
+        if (approximate == "quadratic")
+        {
+        	var gy = groundZero(newXBall[0], 0, 0);
+          if (newYBall[0] < gy)
+            {
+                var newX = newXBall[0];
+                var oldX = xBall;
+                var newY = newYBall[0];
+                var oldY = yBall;
+  
+                newXBall[0] = GetQuadraticZero(lastVertex[0],
+                lastVertex[1], oldX, oldY, newX, newY);
+                newYBall[0] = gy;
+                lastVertex = [newXBall[0], newYBall[0]]; 
+
+            	  Log("	::Столкновение::");
+            	  Log("X: " + newXBall[0] + "Y: " + newYBall[0]);
+  
+                // APPROXIMATE BOUNCE ANGLE
+                newYBall[1] = Math.sqrt(2*9.8*H - VB*VB) * theta;
+                theta = theta * b;
+                Log("	Новая скорость по y: " + newYBall[1]);
+  
+              beenOver = false;
+            }
+        }
+
+
         xBall = newXBall[0];
         yBall = newYBall[0];
         v0[0] = newXBall[1];
         v0[1] = newYBall[1];
 
         // WITHOUT APPROXIMATION4
-        if (!approximate)
+        if (approximate == "none")
         {
+          if (yBall < groundZero(newXBall[0], 0, 0) && beenOver)
+          {
+            beenOver = false;
+            v0[1] = -v0[1]*theta;
+          }
+          else if (yBall > 0)
+          {
+            beenOver = true;
+          }
+        }
+
+        if (approximate == "dt")
+        {
+          dt = (originaldT - (1/(yBall+0.9))*(originaldT - 10)) * 0.001;
+          // console.log(yBall);
+          // dt = 150 * ((yBall + 1) / 6);
+          console.log(dt);
           if (yBall < groundZero(newXBall[0], 0, 0) && beenOver)
           {
             beenOver = false;
@@ -224,11 +328,9 @@ function animate() {
     x : [[Ball[0]]],
     y : [[Ball[1]]]
   }
-
-  if (approximate)
-    Plotly.extendTraces("myDiv", update, [1]);
-  else
-    Plotly.extendTraces("myDiv", update, [0]);
+  
+  Plotly.extendTraces("myDiv", update, [approximationModels[approximate].index]);
+  
 }
 
 
