@@ -4,7 +4,7 @@ var height = 450;
 
 var iterationCounter = 0;
 var animating = false;
-var stopped = false;
+var stopped = true;
 var approximate;
 
 var origin = {x:0, y:10};
@@ -29,7 +29,7 @@ window.toggleDemo = function()
   else
   {
     stopDemo();
-    document.getElementById('DemoButton').innerText = "Начать Моделирование";
+    document.getElementById('DemoButton').innerText = "Начать моделирование";
   }
 }
 
@@ -37,7 +37,8 @@ window.stopDemo=function()
 {
   stopped = true;
   clearInterval(window.interval);
-  document.getElementById('DemoButton').innerText = "Начать Моделирование";
+  document.getElementById('DemoButton').innerText = "Начать моделирование";
+  Log("- Конец эксперимента -");
 }
 
 window.onload = window.onresize = function() {
@@ -52,18 +53,32 @@ window.onload = window.onresize = function() {
 function CreatePlot()
 {
   var Origin = {
-    x : [0, 5, -1],
-    y : [10, 5, 8],
+    x : [0],
+    y : [10],
     mode: 'markers',
     marker: { size: 12 },
     type: 'scatter',
     name: 'Подвес'
   }
 
+  var delta = GetValue('delta');
+  var xy1 = polarToCartesian(origin, (30 + delta)*Math.PI/180, 20);
+  var xy2 = polarToCartesian(origin, (30 - delta)*Math.PI/180, 20);
+  var disconnectZone = {
+    x : [xy1[0], 0 , xy2[0]],
+    y : [xy1[1], 10, xy2[1]],
+    fill: 'toself',
+    fillcolor: '#4CAF5099',
+    line : {
+      color : '#4CAF50'
+    },
+    name: 'Допустимая область'
+  }
+
   var pendulum = {
     x : [0],
     y : [0],
-    name: '???'
+    name: 'Маятник'
   }
 
   var trace = {
@@ -83,7 +98,7 @@ function CreatePlot()
     }
   };
 
-  var data = [pendulum, trace, Origin];
+  var data = [pendulum, trace, Origin, disconnectZone];
   Plotly.plot(Plot, data, layout);
 }
 
@@ -93,12 +108,31 @@ function RecreatePlot()
   var trace = {
     x : [xy[0]],
     y : [xy[1]],
+    mode: 'lines+markers',
     name: 'Траектория полёта'
   };
 
   Plotly.deleteTraces(Plot, [1]);
   Plotly.addTraces(Plot, trace);
   Plotly.moveTraces(Plot, -1, 1);
+
+  var delta = GetValue('delta');
+  var xy1 = polarToCartesian(origin, (30 + delta)*Math.PI/180, 20);
+  var xy2 = polarToCartesian(origin, (30 - delta)*Math.PI/180, 20);
+  var disconnectZone = {
+    x : [xy1[0], 0 , xy2[0]],
+    y : [xy1[1], 10, xy2[1]],
+    fill: 'toself',
+    fillcolor: '#4CAF5099',
+    line : {
+      color : '#4CAF50'
+    },
+    name: 'Допустимая область'
+  }
+
+  Plotly.deleteTraces(Plot, [3]);
+  Plotly.addTraces(Plot, disconnectZone);
+  Plotly.moveTraces(Plot, -1, 3);
 }
 
 window.startDemo=function() {
@@ -106,6 +140,7 @@ window.startDemo=function() {
     iterationCounter = 0;
 
     var originaldT = GetValue('dt');
+    var delta = GetValue('delta') * Math.PI/180;
     window.dt = originaldT * 0.001;
 
     var g = 9.8;
@@ -113,7 +148,7 @@ window.startDemo=function() {
     length = l;
     snapped = false;
 
-    blockAngles = [ cartesianToPolar(origin, {x:-5,y:5}), cartesianToPolar(origin, {x:1,y:8}) ];
+    blockAngles = [ Math.PI/6 ];
     
     angle = GetValue('angle') * Math.PI/180;
     var angleV = 0;
@@ -131,12 +166,18 @@ window.startDemo=function() {
     animating = true;
     animate();
 
+    Log("");
+    Log("- Начало эксперимента -");
+    Log("   Шаг итерации: " + originaldT);
+    Log("   Начальный угол: " + GetValue('angle'));
+    Log("   Допустимое отклонение: " + GetValue('delta'));
+
     window.interval = setInterval(function() 
     {
         if (!snapped)
         {
           var newAngle = rk4(angle, angleV, accelationFunction, window.dt);
-          
+
           angle = newAngle[0];
           angleV = newAngle[1];
           da = angleV;
@@ -144,9 +185,9 @@ window.startDemo=function() {
           for (var i = 0; i < 2; i++)
           {
             var dTheta = blockAngles[i] - angle;
-            if (Math.abs(dTheta) < 0.02)
+            if (Math.abs(dTheta) < delta)
             {
-              Log("snapped");
+              Log(" ÷ Обнаружено событие, угол: " + (angle * 180/Math.PI).toFixed(2));
               snapped = true;
               var xy = polarToCartesian(origin, angle, length);
               
@@ -155,7 +196,6 @@ window.startDemo=function() {
 
               velocity[1] = velocity[1] - 10;
               v0 = [velocity[0] * Math.abs(angleV), velocity[1] * Math.abs(angleV)];
-              // v0 = [0,0];
               xBall = xy[0];
               yBall = xy[1];
               
@@ -168,6 +208,11 @@ window.startDemo=function() {
           var newYBall = rk4(yBall, v0[1], gravityFunction, window.dt);
           xBall = newXBall[0]; v0[0] = newXBall[1];
           yBall = newYBall[0]; v0[1] = newYBall[1];
+          
+          if (yBall < 0)
+          {
+            stopDemo();
+          }
         }
           
         iterationCounter++;

@@ -31,3 +31,15 @@ function rk4(x, v, a, dt) {
 
   return [xf, vf];
 }
+
+
+
+function GetValue(value)
+{
+  return document.getElementById(value).value;
+}
+
+function Log(string)
+{
+	document.getElementById("logText").value += '\n' + string;
+}

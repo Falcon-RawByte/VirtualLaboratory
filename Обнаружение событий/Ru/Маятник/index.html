@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Обнаружение событий - прыгающий мячик</title>
+
+	<link href="https://fonts.googleapis.com/css?family=Encode+Sans+Expanded|Source+Sans+Pro" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<link rel="stylesheet" type="text/css" href="math.css">
+	
+	<script src="js/plotly-latest.min.js"></script>
+	<script src="js/jquery-3.2.0.min.js"></script>
+	<script src="js/Mathcore.js"></script>
+	<script src="js/quadratic.js"></script>
+	<script src="js/pendulum.js"></script>
+
+</head>
+
+<body>
+	<h1>Обнаружение событий<small> - Обрывающийся маятник</small> </h1>
+
+	<div class="canvas">
+		Моделирование системы из математического маятника и груза на конце который, при достижении определённого угла, переходит в состояние свободного падения. В этом эксперименте система может находится в двух различных состояниях, описываемых разным набором уровнений — уравнением осциляциии математического маятника и уравнением свободного падения тела с начальной скоростью. Переход между состояниями система совершает при обнаружении дискретного события: достижение заданного угла.
+	</div>
+
+	<textarea rows="11" cols="50" id="logText">-- Лог эксперимента --</textarea>
+
+	<form>
+		<label>Шаг итерации (в мс)</label>
+		<input type="number" id="dt" step="10" value="90">
+		<label>Начальный угол (в градусах)</label>
+		<input type="number" id="angle" step="5" value="-80">
+		<label>∆ (в градусах)</label>
+		<input type="number" id="delta" step="0.01" value="2">
+
+		<p><a href="javascript:window.toggleDemo()" id="DemoButton">Начать моделирование</a></p>
+	</form>
+
+	<div id="Plotly"></div>
+
+	<ul id="result"></ul>
+
+</body>
+</html>

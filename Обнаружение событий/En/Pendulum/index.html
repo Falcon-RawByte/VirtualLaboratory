@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Event detection — disconnecting pendulum</title>
+
+	<link href="https://fonts.googleapis.com/css?family=Encode+Sans+Expanded|Source+Sans+Pro" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<link rel="stylesheet" type="text/css" href="math.css">
+	
+	<script src="js/plotly-latest.min.js"></script>
+	<script src="js/jquery-3.2.0.min.js"></script>
+	<script src="js/Mathcore.js"></script>
+	<script src="js/quadratic.js"></script>
+	<script src="js/pendulum.js"></script>
+
+</head>
+
+<body>
+	<h1>Event detection<small> - disconnecting pendulum</small> </h1>
+
+	<div class="canvas">
+		This model represents a system of a bob on the end of a mathematical pendulum, that upon reaching the given angle starts free-falling. 
+		In this experiment system has two different states that are described using two sets of differential equations — pendulum oscilation and equation for a free falling body in uniform gravitational field  
+		The transition from one state to another happens once the system detects a discrete event of pedulum reaching the given angle.
+	</div>
+
+	<textarea rows="11" cols="50" id="logText">-- Experiment Log --</textarea>
+
+	<form>
+		<label>Iteration step (ms)</label>
+		<input type="number" id="dt" step="10" value="90">
+		<label>Starting angle (˚)</label>
+		<input type="number" id="angle" step="5" value="-80">
+		<label>∆ (˚)</label>
+		<input type="number" id="delta" step="0.01" value="2">
+
+		<p><a href="javascript:window.toggleDemo()" id="DemoButton">Start</a></p>
+	</form>
+
+	<div id="Plotly"></div>
+
+	<ul id="result"></ul>
+
+</body>
+</html>
