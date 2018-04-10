@@ -187,7 +187,7 @@ window.startDemo=function() {
             var dTheta = blockAngles[i] - angle;
             if (Math.abs(dTheta) < delta)
             {
-              Log(" ÷ Обнаружено столкновение, угол: " + (angle * 180/Math.PI).toFixed(2));
+              Log(" ÷ Обнаружено событие, угол: " + (angle * 180/Math.PI).toFixed(2));
               snapped = true;
               var xy = polarToCartesian(origin, angle, length);
               
@@ -196,7 +196,6 @@ window.startDemo=function() {
 
               velocity[1] = velocity[1] - 10;
               v0 = [velocity[0] * Math.abs(angleV), velocity[1] * Math.abs(angleV)];
-              // v0 = [0,0];
               xBall = xy[0];
               yBall = xy[1];
               

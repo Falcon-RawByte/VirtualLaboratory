@@ -13,7 +13,7 @@
 	<script src="js/jquery-3.2.0.min.js"></script>
 	<script src="js/Mathcore.js"></script>
 	<script src="js/quadratic.js"></script>
-	<script src="js/PlaneExample.js"></script>
+	<script src="js/model.js"></script>
 
 </head>
 
@@ -31,16 +31,16 @@
 	<textarea rows="13" cols="50" id="logText">-- Лог эксперимента --</textarea>
 
 	<form>
-		<label>Шаг итерации (в мс)</label>
+		<label>Iteration step (ms)</label>
 		<input type="number" id="dt" step="10" value="50">
-
-		<label>H (в метрах)</label>
+		
+		<label>H (m)</label>
 		<input type="number" id="H" step="10" value="5">
 
-		<label>V<sub>ball</sub> (в м/с)</label>
+		<label>V<sub>ball</sub> (m/s)</label>
 		<input type="number" id="Vb" step="10" value="1">
 
-		<label>&beta; в пределах [0,1]</label>
+		<label>&beta;</label>
 		<input type="number" id="beta" step="0.05" value="0.6">
 		
 		<br>
@@ -49,7 +49,7 @@
 		<input type="radio" name="approx" value="quadratic"> Quadratic approximation
 		<input type="radio" name="approx" value="dt"> Variable step
 
-		<p><a href="javascript:window.toggleDemo()" id="DemoButton">Начать Моделирование</a></p>
+		<p><a href="javascript:window.toggleDemo()" id="DemoButton">Start</a></p>
 	</form>
 
 	<!-- <canvas id="myCanvas" width="900" height="500"></canvas> -->
