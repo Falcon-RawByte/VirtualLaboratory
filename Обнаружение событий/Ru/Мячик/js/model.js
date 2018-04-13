@@ -44,7 +44,7 @@ function getAnalyticalPoints(b, VB, xBall, yBall) {
   var y = [yBall, 0];
 
   var i = 0;
-  var maxIterations = 15;
+  var maxIterations = 10;
 
   Log("   Аналитические точки падения");
   while (yBall > precision) {
@@ -235,7 +235,7 @@ window.startDemo = function () {
         Log("   X: " + newXBall[0].toFixed(3) + "  Y: " + newYBall[0].toFixed(3));
 
         // APPROXIMATE BOUNCE ANGLE
-        newYBall[1] = Math.sqrt(2 * 9.8 * H - VB * VB) * theta;
+        newYBall[1] = Math.sqrt(2 * 9.8 * H) * theta;
         theta = theta * b;
         beenOver = false;
       }
@@ -258,7 +258,7 @@ window.startDemo = function () {
         Log("   X: " + newXBall[0].toFixed(3) + "  Y: " + newYBall[0].toFixed(3));
 
         // APPROXIMATE BOUNCE ANGLE
-        newYBall[1] = Math.sqrt(2 * 9.8 * H - VB * VB) * theta;
+        newYBall[1] = Math.sqrt(2 * 9.8 * H) * theta;
         theta = theta * b;
         beenOver = false;
       }
