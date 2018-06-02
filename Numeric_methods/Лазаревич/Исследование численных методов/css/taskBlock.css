@@ -1,0 +1,40 @@
+#taskBlock
+{
+	/*width:100%;*/
+	margin: 10px 0.2%;
+	border:2px solid black;
+}
+#taskDescriptionLabel
+{
+	border-top:2px solid black;
+	border-bottom:2px solid black;
+	padding:5px;
+}
+#taskBlockLabel
+{
+	border-bottom:2px solid black;
+	padding:5px;
+}
+#taskList
+{
+	height:200px;
+	overflow-y:auto;
+}
+
+
+.taskListElement
+{
+	cursor:pointer;
+	padding:2px 5px;
+	-webkit-user-select: none;  /* Chrome all / Safari all */
+	-moz-user-select: none;     /* Firefox all */
+	-ms-user-select: none;      /* IE 10+ */
+	user-select: none;
+}
+
+#taskDescription
+{
+	padding:5px 5px 0px 5px;
+	height:200px;
+	overflow-y:auto;
+}

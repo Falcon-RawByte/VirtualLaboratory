@@ -1,0 +1,134 @@
+#addButton
+{
+	width:254px;
+	height:52px;
+	border-radius:0px;
+}
+#addButton:disabled
+{
+}
+
+
+.methodNumber
+{
+	display:inline-block;
+	width:20px;
+}
+.methodName
+{
+	display:inline;
+	/*width:80px;*/
+	overflow-wrap: break-word;
+	word-wrap:break-word;
+}
+.methodColor
+{
+	display:inline-block;
+	background-color:black;
+}
+.methodRemoveButton,.methodColor
+{
+	margin-top:2px;
+	margin-left:2px;
+	margin-right:2px;
+	margin-bottom:2px;
+	width:21px;
+	height:21px;
+}
+.methodRemoveButton
+{
+	display:flex;
+}
+#methodAddingTable
+{
+	display:table;
+	border-spacing:5px;
+}
+.methodRemoveIcon
+{
+	margin:auto;
+	width:60%;
+	height:60%;
+	filter:grayscale(100%);
+	-webkit-filter:grayscale(100%);
+}
+.methodRemoveButton:hover .methodRemoveIcon
+{
+	filter:grayscale(0%);
+	-webkit-filter:grayscale(0%);
+}
+/*#methodList
+{
+	background-color:#E600CE;
+	width:auto;
+	height:250px;
+	display:flex;
+}*/
+#methodsBlock
+{
+	border: 2px solid black;
+	margin: 10px 0.2%;
+}
+#methodsListBlock
+{
+	/*! background-color:#AE0A0A; */
+	width:auto;
+	min-height:265px;
+	display:flex;
+}
+#methodsList
+{
+	border-right:2px solid black;
+}
+
+#methodParameters
+{
+	width:auto; 
+	flex-grow: 1;
+}
+.methodListItem
+{
+	cursor:pointer;
+	display:flex;
+	min-height:52px;
+	padding:2px;
+	-webkit-user-select: none;  /* Chrome all / Safari all */
+	-moz-user-select: none;     /* Firefox all */
+	-ms-user-select: none;      /* IE 10+ */
+	user-select: none;  
+}
+.methodListItem:hover
+{
+	background-color:#ccc;
+	box-shadow:inset 0px 0px 2px 2px #092905;
+}
+.methodListItemSelected,.methodListItemSelected:hover
+{
+	background-color:#007bff;
+	color:white;
+	box-shadow:inset 0px 0px 2px 2px #092905;
+}
+.methodInfoContainer
+{
+	width:200px;
+	display:flex;
+}
+
+.methodBlockBody
+{
+	display:none;
+	position:absolute;
+	right:0;
+}
+#methodsBlockLabel
+{
+	border-bottom:2px solid black;
+	padding:5px;
+}
+
+.addButtonIcon
+{
+	width:100%;
+	height:100%;
+	padding:5px;
+}

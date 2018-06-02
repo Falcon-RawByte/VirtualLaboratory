@@ -1,0 +1,19 @@
+
+
+#outputParametersBlock
+{
+	margin: 10px 0.2%;
+	border:2px solid black;
+	/*height:150px;*/
+}
+
+#outputParametersLabel
+{
+	padding:5px;
+	border-bottom:2px solid black;
+}
+
+#outputParametersContent
+{
+	padding:5px;
+}

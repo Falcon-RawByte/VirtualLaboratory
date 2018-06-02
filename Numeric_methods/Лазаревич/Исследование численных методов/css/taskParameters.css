@@ -1,0 +1,18 @@
+
+#taskParametersBlock
+{
+	/*! background-color:#0014AF; */
+	/*! color:white; */
+	border-right:2px solid black;
+	border-left:2px solid black;
+	border-bottom:2px solid black;
+	margin:0px 0.2%;
+}
+
+#taskParameters,#taskInitials
+{
+	padding:5px;
+	border-top:2px solid black;
+	border-bottom:2px solid black;
+	/*! color:white; */
+}

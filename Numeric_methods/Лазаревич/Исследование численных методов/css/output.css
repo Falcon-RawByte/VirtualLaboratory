@@ -1,0 +1,23 @@
+
+
+#outputBlock
+{
+	margin:0px 0.2%;
+
+}
+
+.startButton
+{
+	margin-top:3px;
+	margin-bottom:3px;
+}
+#outputPlotIntervalLabel
+{
+	padding:5px;
+	border-top:2px solid black;
+	border-bottom:2px solid black;
+}
+#output
+{
+	
+}
