@@ -30,7 +30,7 @@ form {
 	margin-left: 5%;
 }
 
-a {
+#DemoButton{
 	display: inline;
 	color: black;
 	text-decoration: none;
@@ -40,6 +40,20 @@ a {
   	border-right: 1px solid #333333;
   	border-bottom: 1px solid #333333;
   	border-left: 1px solid #CCCCCC;
+}
+
+.pdf {
+	position:absolute;
+   top:0;
+   right:0;
+   font-size : 15px;
+	margin-right: 2%;
+	margin-top: 2%;
+	color: #EE552C;
+}
+
+#pdf-img {
+	width: 16px;
 }
 
 input {

@@ -30,7 +30,22 @@ form {
 	margin-left: 5%;
 }
 
-a {
+
+.pdf {
+	position:absolute;
+   top:0;
+   right:0;
+   font-size : 15px;
+	margin-right: 2%;
+	margin-top: 2%;
+	color: #EE552C;
+}
+
+#pdf-img {
+	width: 16px;
+}
+
+#DemoButton {
 	display: inline;
 	color: black;
 	text-decoration: none;
