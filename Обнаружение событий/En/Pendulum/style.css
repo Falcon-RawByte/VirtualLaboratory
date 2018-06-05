@@ -42,6 +42,21 @@ form {
   	border-left: 1px solid #CCCCCC;
 }
 
+.pdf {
+	position:absolute;
+   top:0;
+   right:0;
+   font-size : 15px;
+	margin-right: 2%;
+	margin-top: 2%;
+	color: #EE552C;
+}
+
+#pdf-img {
+	width: 16px;
+}
+
+
 input {
 	display: inline-block;
 	width: 50%;
