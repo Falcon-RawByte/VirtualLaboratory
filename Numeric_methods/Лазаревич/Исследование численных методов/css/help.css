@@ -1,0 +1,158 @@
+
+
+#helpContent
+{
+	display:flex;
+	flex-direction:row;
+	justify-content: space-between;
+	position:fixed;
+	left:0px;
+	right:0px;
+	bottom:0px;
+	min-height:150px;
+	z-index:1002;
+	box-shadow:outset 0px 0px 10px 0px white;
+}
+
+.helpChangeIcon
+{
+	width:100%;
+	height:100%;
+}
+
+.helpDescriptionLabel
+{
+	padding:5px;
+	border-bottom:2px solid black;
+
+}
+
+.hideable
+{
+	transform:translateY(50%);
+	transition:all .4s;
+}
+
+.showModal
+{
+	transform:translateY(0%);
+}
+
+#helpLabel
+{
+	padding:5px;
+	border-bottom:2px solid black;
+}
+
+#helpDescription
+{
+	flex-grow:1;
+	/*text-align:center;*/
+	z-index:inherit;
+	display:flex;
+	flex-direction: column;
+	justify-content: start;
+	align-items: center;
+	width:100%;
+	max-height: 400px;
+	overflow-y:auto;
+	-webkit-user-select: none;  /* Chrome all / Safari all */
+	-moz-user-select: none;     /* Firefox all */
+	-ms-user-select: none;      /* IE 10+ */
+	user-select: none;  
+}
+.m-fadeOut {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s linear 300ms;
+}
+.m-fadeIn {
+  visibility: visible;
+  opacity: 1;
+  transition: visibility 0s linear 0s;
+}
+#helpContentBackground
+{
+	position:absolute;
+	bottom:0px;
+	top:0px;
+	left:0px;
+	right:0px;
+	background-color:white;
+	opacity:0.95;
+	z-index:1001;
+}
+#svgHelpIcon
+{
+	width:60%;
+	height:60%;
+	margin:auto;
+}
+#helpIcon:hover
+{
+	fill:#2d53c2;
+	background-color:white;
+	transition:fill 0.5s background-color 0.5s;
+	box-shadow:0px 0px 0px 2px inset #2d53c2;
+}
+#helpIcon
+{
+	display:flex;
+	position:fixed;
+	top:15px;
+	right:15px;
+	background-color:#2d53c2;
+	width:50px;
+	height:50px;
+	border-radius:25px;
+	z-index:1000;
+	cursor: pointer;
+	justify-content: center;
+	align-content: center;
+	fill:white;
+}
+.helpDescriptionContent
+{
+	width:100%;
+
+}
+#helpBackground
+{
+	position:fixed;
+	opacity:0.5;
+	bottom:0px;
+	top:0px;
+	left:0px;
+	right:0px;
+	z-index:3;
+	background-color:black;
+}
+
+
+.showFocused
+{
+	position:relative;
+	z-index:4;
+}
+
+
+#helpNext,#helpPrevios
+{
+	flex-shrink:0;
+	width:100px;
+	height:40px;
+	margin:auto 30px 50px 30px;
+	/*background-color:red;*/
+	z-index:inherit;
+	cursor: pointer;
+	fill:black;
+	-webkit-user-select: none;  /* Chrome all / Safari all */
+	-moz-user-select: none;     /* Firefox all */
+	-ms-user-select: none;      /* IE 10+ */
+	user-select: none;
+}
+
+#helpNext:hover,#helpPrevios:hover
+{
+	fill:green;
+}

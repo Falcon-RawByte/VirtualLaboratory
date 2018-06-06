@@ -57,17 +57,28 @@
 	width:250px;
 }
 
-#sessionCreationBlock
+.sessionCreationBlock
 {
 	padding:5px;
-	border-right:2px solid black;
 }
 
 #sessionBlock
 {
+	margin:5px 0.2% 0px 0.2%;
+}
+
+#sessionBlockLabel
+{
+	border-top:2px solid black;
+	border-left:2px solid black;
+	border-right:2px solid black;
+	padding:5px;
+}
+
+#sessionListBlock
+{
+	background-color:white;
 	display:flex;
 	flex-direction:row;
-	margin:5px 0.2% 0px 0.2%;
 	border:2px solid black;
-
 }

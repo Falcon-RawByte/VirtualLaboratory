@@ -68,6 +68,7 @@
 {
 	border: 2px solid black;
 	margin: 10px 0.2%;
+	background-color:white;
 }
 #methodsListBlock
 {
@@ -79,12 +80,14 @@
 #methodsList
 {
 	border-right:2px solid black;
+	background-color:white;
 }
 
 #methodParameters
 {
 	width:auto; 
 	flex-grow: 1;
+	background-color:white;
 }
 .methodListItem
 {

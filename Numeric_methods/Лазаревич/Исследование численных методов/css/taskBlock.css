@@ -19,6 +19,7 @@
 {
 	height:200px;
 	overflow-y:auto;
+	position:relative;
 }
 
 
@@ -35,6 +36,9 @@
 #taskDescription
 {
 	padding:5px 5px 0px 5px;
-	height:200px;
-	overflow-y:auto;
+	height:250px;
+	overflow-y:auto; 
+	resize: vertical;
+	background-color: white;
+	position:relative;
 }
