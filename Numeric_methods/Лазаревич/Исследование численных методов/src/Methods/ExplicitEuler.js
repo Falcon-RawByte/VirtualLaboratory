@@ -70,6 +70,10 @@ class ExplicitEulerMethod
 		//console.log(delta_calc);
 		var tStep=this.step;
 		this.step=Math.min(Math.max(this.minStep,delta_calc),this.maxStep);
+		if(isNaN(this.step)||this.step==undefined)
+		{
+			this.step=this.minStep;
+		}
 		complexity.rightSideEvaluation+=count*2;
 		if(this.step<halfstep)//если шаг меньше половины иходного, посчитать заново
 		{

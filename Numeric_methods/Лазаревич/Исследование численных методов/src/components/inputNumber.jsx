@@ -23,17 +23,15 @@ class InputNumber extends React.Component
 		val=parseFloat(val);
 		if(isNaN(val))
 		{
-			val=this.props.value;
-		}else
+			val=isNaN(this.props.value)?0:this.props.value;
+		}
+		if(this.props.min!=undefined&&!isNaN(this.props.min))
 		{
-			if(this.props.min!=undefined&&!isNaN(this.props.min))
-			{
-				val=Math.max(this.props.min,val);
-			}
-			if(this.props.max!=undefined&&!isNaN(this.props.max))
-			{
-				val=Math.min(this.props.max,val);
-			}
+			val=Math.max(this.props.min,val);
+		}
+		if(this.props.max!=undefined&&!isNaN(this.props.max))
+		{
+			val=Math.min(this.props.max,val);
 		}
 		this.setState({value:val});
 		this.props.onChange({target:{value:val,name:this.props.name,type:this.props.type}});
@@ -45,7 +43,8 @@ class InputNumber extends React.Component
 			className+=" methodListItemSelected";
 		}
 		return (<div >
-				<input className={this.props.className} type="number" onChange={this._onChange} onBlur={this._onBlur} value={this.state.value} min={this.props.min} max={this.props.max} step="any"/>
+				<input className={this.props.className} type="number" onChange={this._onChange} 
+				onClick={function(e){e.target.focus()}} onBlur={this._onBlur} value={this.state.value} min={this.props.min} max={this.props.max} step="any"/>
 			</div>
 			);
 	}

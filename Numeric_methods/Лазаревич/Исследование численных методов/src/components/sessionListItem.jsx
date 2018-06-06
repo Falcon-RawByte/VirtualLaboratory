@@ -25,7 +25,7 @@ class SessionListItem extends React.Component
 							{this.props.sessionName}
 						</div>
 						<div className="presetButtonContainer">
-							<button type="button" className="btn btn-dark presetButton" onClick={this._load}>Загрузить</button>
+							<button type="button" className="btn btn-primary presetButton" onClick={this._load}>Загрузить</button>
 							<button type="button" className="btn btn-danger presetButton" onClick={this._delete}>Удалить</button>
 						</div>
 					</div>

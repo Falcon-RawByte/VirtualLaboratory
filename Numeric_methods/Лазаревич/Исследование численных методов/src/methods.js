@@ -3,10 +3,15 @@ import ExplicitRalston from "./Methods/ExplicitRalston.js";
 import ExplicitTrapezoidal from "./Methods/ExplicitTrapezoidal.js";
 import ExplicitMidpoint from "./Methods/ExplicitMidpoint.js";
 import ExplicitRK4 from "./Methods/ExplicitRK4.js";
+import ExplicitRK6_1 from "./Methods/ExplicitRK6_1.js";
+import ExplicitRK6_2 from "./Methods/ExplicitRK6_2.js";
 import ExplicitDormandPrince from "./Methods/ExplicitDormandPrince.js";
 import ImplicitEuler from "./Methods/ImplicitEuler.js";
-import ImplicitRadauI5 from "./Methods/ImplicitRadauI5.js";
-import AdamsBashfortMethodFixedStep from "./Methods/AdamsBashfortMethodFixedStep.js";
+import ImplicitRadauIA5 from "./Methods/ImplicitRadauIA5.js";
+import AdamsBashfort from "./Methods/AdamsBashfort.js";
+import ImplicitLobatto3C from "./Methods/ImplicitLobatto3C.js";
+import BackwardDifferentiationFormulas from "./Methods/BackwardDifferentiationFormulas.js";
+import AdamsMulton from "./Methods/AdamsMulton.js";
 
 var Methods;
 
@@ -16,33 +21,21 @@ var InitMethods=function(){
 		//http://people.inf.ethz.ch/arbenz/ewp/Lnotes/chapter4.pdf
 	Methods=(function()
 	{
-			/*DIRK=(function()
-		{
-			function SolveLowTriangular()
-			{
-
-
-
-
-
-			return {,,attributes:{name:"Diagonally implicit RK",options:['useJacobian']}};
-		})();*/
-	/*RadauIIA5=(function(){
-
-
-
-		return {};
-	})();*/
 		return [
 			ExplicitEulerMethod,
 			ExplicitRalston,
 			ExplicitTrapezoidal,
 			ExplicitMidpoint,
 			ExplicitRK4,
+			ExplicitRK6_1,
+			ExplicitRK6_2,
 			ExplicitDormandPrince,
 			ImplicitEuler,
-			ImplicitRadauI5,
-			AdamsBashfortMethodFixedStep
+			ImplicitRadauIA5,
+			ImplicitLobatto3C,
+			AdamsBashfort,
+			BackwardDifferentiationFormulas,
+			AdamsMulton
 		];
 	})();
 }

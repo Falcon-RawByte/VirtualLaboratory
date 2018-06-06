@@ -2,28 +2,44 @@ import gaussSolve from "../gauss.js";
 import ImplicitLobatto3C from "./ImplicitLobatto3C.js";
 
 
-class AdamsMulton
-{
 
+class BackwardDifferentiationFormulas
+{
 	constructor()
 	{
+		this.step=0;
+		this.funcs;
+		this.jacobianConst=false;
+		this.jacobian=null;
+		this.jacobian_m;
+		this.counter=0;
+		this.points=null;
+		this.maxOrder=1;
+		this.counter=1;
+		this.methodOptions={
+			f_abs_error:0.001,
+			max_newton_iterations:5,
+			min_newton_abs_change:0.01,
+			min_newton_rel_change:0.1,
+			y_abs_error:0.001
+		};
 		this.coefficients=[
-		[0.5],
-		[2/3,-1/12],
-		[19/24,-5/24,1/24],
-		[323/360,-11/30,53/360,-19/720],
-		[1427/1440,-133/240,241/720,-173/1440,3/160]
-		];
-		this.stepCoeffs=[1,0.5,5/12,3/8,251/720,95/288];
+			[1],
+			[4/3,-1/3],
+			[18/11,-9/11,2/11],
+			[48/25,-36/25,16/25,-3/25],
+			[300/137,-300/137,200/137,-75/137,12/137],
+			[360/147,-450/147,400/147,225/147,72/147,-10/147]];
+			this.stepCoeffs=[1,2/3,6/11,12/25,60/137,60/147];
 		this.max_iteration=10;
-		this.Method=new ImplicitLobatto3C();
 		this.methodOptions={
 				f_abs_error:0.001,
 				max_newton_iterations:5,
 				min_newton_abs_change:0.01,
 				min_newton_rel_change:0.1,
 				k_abs_error:0.001
-			};
+		};
+		this.Method=new ImplicitLobatto3C();
 	}
 	Init(options)
 	{
@@ -33,6 +49,7 @@ class AdamsMulton
 		this.maxOrder=options.maxOrder!==undefined?Math.max(1,Math.min(5,options.maxOrder)):5;
 		this.points=new Array(/*maxOrder*funcs.length*/);
 		//console.log(maxOrder);
+
 		this.jacobianConst=(options.jacobianConst==true?true:false);
 		var count=this.funcs.length;
 		this.jacobian_m=new Array(count*count);
@@ -59,32 +76,6 @@ class AdamsMulton
 		}
 		this.Method.Init(options);
 	}
-	StepFirstNumeric(data,complexity)
-	{
-		for(var i=this.funcs.length-1;i>-1;i--)
-		{
-			this.points.unshift(this.step*this.funcs[i](data.xv,data.t));
-		}
-		this.Method.Step(data,complexity);
-		this.counter++;
-		if(this.counter==this.maxOrder)
-		{
-			this.Step=this.StepGeneralNumeric;
-		}
-	}
-	StepFirstAnalytic(data,complexity)
-	{
-		for(var i=this.funcs.length-1;i>-1;i--)
-		{
-			this.points.unshift(this.step*this.funcs[i](data.xv,data.t));
-		}
-		this.Method.Step(data,complexity);
-		this.counter++;
-		if(this.counter==this.maxOrder)
-		{
-			this.Step=this.StepGeneralAnalytic;
-		}
-	}
 	F(yn_s,b_s,stepCoeff,step,func,yn_v,tn_s)
 	{
 		return yn_s-b_s-stepCoeff*step*func(yn_v,tn_s);
@@ -97,28 +88,50 @@ class AdamsMulton
 	{
 		return delta-step*stepCoeff*df;
 	}
+	StepFirstNumeric(data,complexity)
+	{
+		for(var i=this.funcs.length-1;i>-1;i--)
+		{
+			this.points.unshift(data.xv[i]);
+		}
+		this.Method.Step(data,complexity);
+		this.counter++;
+		if(this.counter==this.maxOrder)
+		{
+			this.Step=this.StepGeneralNumeric;
+		}
+	}
+	StepFirstAnalytic(data,complexity)
+	{
+		for(var i=this.funcs.length-1;i>-1;i--)
+		{
+			this.points.unshift(data.xv[i]);
+		}
+		this.Method.Step(data,complexity);
+		this.counter++;
+		if(this.counter==this.maxOrder)
+		{
+			this.Step=this.StepGeneralAnalytic;
+		}
+	}
 	StepGeneralNumeric(data,complexity)
 	{
 		var count=data.xv.length;
 
+		this.points.splice((this.maxOrder-1)*count,count);
 		//console.log('postsplice: '+points);
+		for(var i=count-1;i>-1;i--)
+		{
+			this.points.unshift(data.xv[i]);
+		}
 		//console.log(points);
 		var b_v=new Array(data.xv.length);
 		for(var i=0;i<count;i++)
-			b_v[i]=data.xv[i];
-		for(var j=0;j<this.counter-1;j++)
+			b_v[i]=0;
+		for(var j=0;j<this.counter;j++)
 		{
 			for(var i=0;i<count;i++)
 				b_v[i]+=this.points[i+j*count]*this.coefficients[this.counter-1][j];
-		}
-		if(this.counter>1)
-		{
-			this.points.splice((this.maxOrder-2)*count,count);
-			for(var i=count-1;i>-1;i--)
-			{
-				this.points.unshift(this.step*this.funcs[i](data.xv,data.t));
-			}
-			complexity.rightSideEvaluation+=count;
 		}
 
 		var max_iteration=10;
@@ -130,6 +143,12 @@ class AdamsMulton
 		var k=0;
 		var stepCoeff=this.stepCoeffs[this.counter-1];
 		var last_f_difference=0;
+		for(var i=0;i<count;i++)
+		{
+			f[i]=-this.F(y[i],b_v[i],stepCoeff,this.step,this.funcs[i],y,t_next);
+			last_f_difference=Math.max(last_f_difference,Math.abs(f[i]));
+		}
+
 		if(this.jacobianConst==true)
 		{
 			for(var j=0;j<count;j++)
@@ -146,11 +165,6 @@ class AdamsMulton
 					y[i]=y_temp;
 				}
 			}
-		}
-		for(var i=0;i<count;i++)
-		{
-			f[i]=-this.F(y[i],b_v[i],stepCoeff,this.step,this.funcs[i],y,t_next);
-			last_f_difference=Math.max(last_f_difference,Math.abs(f[i]));
 		}
 		while(true)
 		{
@@ -230,24 +244,20 @@ class AdamsMulton
 	{
 		var count=data.xv.length;
 
+		this.points.splice((this.maxOrder-1)*count,count);
 		//console.log('postsplice: '+points);
+		for(var i=count-1;i>-1;i--)
+		{
+			this.points.unshift(data.xv[i]);
+		}
 		//console.log(points);
 		var b_v=new Array(data.xv.length);
 		for(var i=0;i<count;i++)
-			b_v[i]=data.xv[i];
-		for(var j=0;j<this.counter-1;j++)
+			b_v[i]=0;
+		for(var j=0;j<this.counter;j++)
 		{
 			for(var i=0;i<count;i++)
 				b_v[i]+=this.points[i+j*count]*this.coefficients[this.counter-1][j];
-		}
-		if(this.counter>1)
-		{
-			this.points.splice((this.maxOrder-2)*count,count);
-			for(var i=count-1;i>-1;i--)
-			{
-				this.points.unshift(this.step*this.funcs[i](data.xv,data.t));
-			}
-			complexity.rightSideEvaluation+=count;
 		}
 		var f=new Array(count);
 		var y=data.xv.slice();
@@ -341,9 +351,9 @@ class AdamsMulton
 	}
 }
 
-AdamsMulton.attributes={name:"Неявные методы Адамса-Мультона"};
-AdamsMulton.options=["chooseOrderEnabled",'jacobianMatrixEnabled'];
-AdamsMulton.minOrder=1;
-AdamsMulton.maxOrder=6;
+BackwardDifferentiationFormulas.attributes={name:"Формулы обратного дифференцирования"};
+BackwardDifferentiationFormulas.options=["chooseOrderEnabled",'jacobianMatrixEnabled'];
+BackwardDifferentiationFormulas.minOrder=1;
+BackwardDifferentiationFormulas.maxOrder=6;
 
-export default AdamsMulton;
+export default BackwardDifferentiationFormulas;

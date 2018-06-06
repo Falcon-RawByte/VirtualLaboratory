@@ -58,6 +58,7 @@ var lorentz={
     {
         name:"t",
         description:"Начальное время",
+        plotDescription:'Время',
         default:0,
         step:'any',
         min:0,
@@ -125,8 +126,10 @@ var lorentz={
     ],
     taskInfo:
     {
-        name:"Аттрактор Лоренца",
-        description:``
+        name:"Система Лоренца",
+        description:`<div>Система Лоренца представляет собой систему ОДУ следующего вида:</div>
+        <div style='margin:0px 40px 20px;'><img src='./img/lorentz16px.png'></div>
+        <div>где x, y, z - координаты, \u03c3, r, b - параметры.</div>`
     },
     getFunctions:function getFunctions(parameters)
     {
@@ -148,9 +151,10 @@ var lorentz={
     },
     methodsAttributes:
     {
-        stepvalue:10,
-        stepmin:10e-1,
-        stepmax:500
+        stepValue:10,
+        stepMin:10e-1,
+        stepMax:500,
+        jacobianAnalythicEnabled:true
     },
     getJacobian:function getJacobian(parameters)
     {

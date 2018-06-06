@@ -131,7 +131,7 @@ class SerialSolver
 		let plots=new Array();
 		for(var i=0;i<outputParameters.plots.length;i++)
 		{
-			if(outputParameters.plots[i].value==true)
+			if(outputParameters.plots[i]==true)
 			{
 				plotVariables[task.plotInfo[i].x.index]=true;
 				plotVariables[task.plotInfo[i].y.index]=true;
@@ -188,7 +188,7 @@ class SerialSolver
 			{
 				lastDifference[j]=0;
 			}
-			let complexity={rightSideEvaluation:0,currentStep:0,averageStep:0,stepCount:0};
+			let complexity={rightSideEvaluation:0,currentStep:0,averageStep:0,stepCount:0,matrixSolving:0,jacobianCalculations:0};
 			let localError=undefined;
 			let globalError=undefined;
 			let maxLocalError=undefined;
@@ -238,7 +238,7 @@ class SerialSolver
 				maxLocalError=0;
 				maxGlobalError=0;
 				finalGlobalError=0;
-				let mainComplexity={rightSideEvaluation:0,currentStep:0,averageStep:0,stepCount:0};
+				let mainComplexity={rightSideEvaluation:0,currentStep:0,averageStep:0,stepCount:0,matrixSolving:0,jacobianCalculations:0};
 				let xvtMain={xv:variables.slice(),t:t0};
 				let xvt={xv:variables.slice(),t:t0};
 				let lastxvt={xv:xvtMain.xv.slice(),t:xvtMain.t};
@@ -256,6 +256,7 @@ class SerialSolver
 					maxOrder:methods[Main].parameters.selectedOrder
 					});
 				let condition=(xvt.t<=tLast);
+				let prevT=xvt.t;
 				while(condition)
 				{
 					if(xvt.t>=tLast&&xvtMain.t>=tLast&&xvtMain.t>=xvt.t)
@@ -276,12 +277,15 @@ class SerialSolver
 							lastDifference[j]=difference;
 							globalErrorValue += Math.pow(difference,2);
 						}
+						let tempLocal=localErrorValue;
+						let tempGlobal=globalErrorValue;
 						globalErrorValue=Math.sqrt(globalErrorValue);
 						localErrorValue=Math.sqrt(localErrorValue);
 						maxGlobalError=Math.max(globalErrorValue,maxGlobalError);
 						maxLocalError=Math.max(localErrorValue,maxLocalError);
-						localError+=localErrorValue;
-						globalError+=globalErrorValue;
+						localError+=0.5*(localErrorValue+tempLocal)*(prevT-t);
+						globalError+=0.5*(globalErrorValue+tempGlobal)*(prevT-t);
+						prevT=t;
 						finalGlobalError=globalErrorValue;
 						if(plotCondition&&xvt.t<=t1Plot&&(xvt.t>=t0Plot))
 						{
@@ -325,8 +329,13 @@ class SerialSolver
 							lastDifference[j]=difference;
 							globalErrorValue += Math.pow(difference,2);
 						}
+						let tempLocal=localErrorValue;
+						let tempGlobal=globalErrorValue;
 						globalErrorValue=Math.sqrt(globalErrorValue);
 						localErrorValue=Math.sqrt(localErrorValue);
+						localError+=0.5*(localErrorValue+tempLocal)*(prevT-t);
+						globalError+=0.5*(globalErrorValue+tempGlobal)*(prevT-t);
+						prevT=t;
 
 
 						maxGlobalError=Math.max(globalErrorValue,maxGlobalError);
@@ -361,8 +370,8 @@ class SerialSolver
 						continue;
 					}
 				}
-				localError/=Math.max(1,complexity.stepCount);
-				globalError/=Math.max(1,complexity.stepCount);
+				localError/=(xvt.t-t0);
+				globalError/=(xvt.t-t0);
 			}
 			//copy results
 			complexity.averageStep/=Math.max(1,complexity.stepCount);
@@ -373,6 +382,8 @@ class SerialSolver
 				maxGlobalError:maxGlobalError,
 				finalGlobalError:finalGlobalError,
 				calculations:complexity.rightSideEvaluation,
+				jacobianCalculations:complexity.jacobianCalculations,
+				matrixSolving:complexity.matrixSolving,
 				averageStep:complexity.averageStep});
 
 			output.methods.push({name:methods[i].parameters.selectedMethod,color:i});

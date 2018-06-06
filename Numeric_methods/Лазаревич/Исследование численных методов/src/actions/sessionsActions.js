@@ -8,7 +8,8 @@ export const SESSIONS_ACTIONS=
 	DELETE_SESSION:"DELETE_SESSION",
 	LOAD_SESSION:"LOAD_SESSION",
 	SAVE_SESSION:"SAVE_SESSION",
-	UPDATE_SESSION:"UPDATE_SESSION"
+	UPDATE_SESSION:"UPDATE_SESSION",
+	LOAD_FILE:"LOAD_FILE"
 };
 
 class SessionsActions{
@@ -33,6 +34,13 @@ class SessionsActions{
 			type:SESSIONS_ACTIONS.LOAD_SESSION,
 			id:id
 		});
+	}
+	loadFile(content)
+	{
+		Dispatcher.dispatch({
+			type:SESSIONS_ACTIONS.LOAD_FILE,
+			content:content
+		})
 	}
 	updateSession(id)
 	{

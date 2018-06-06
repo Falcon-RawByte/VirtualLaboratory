@@ -85,16 +85,16 @@ class MethodParameters extends React.Component
 					</div>
 					<div className="table_row">
 						<label className="table_label">Шаг, 1E-3</label>
-						<InputNumber className="table_input step" type="number" name="stepValue" onChange={this._inputChange} value={this.props.parameters.stepValue} step="0.001" min="0" max={this.props.stepMax}/>
+						<InputNumber className="table_input step" type="number" name="stepValue" onChange={this._inputChange} value={this.props.parameters.stepValue} step="any" min={this.props.taskDependent.stepMin} max={this.props.taskDependent.stepMax}/>
 					</div>
 					<div className="table_row_group autoStep" style={(!options.autoStepEnabled)?{display:'none'}:{}}>
 						<div className="table_row">
 							<label className="table_label">Максимальный шаг, 1E-3</label>
-							<InputNumber className="table_input maxStep" type="number" name="maxstepValue" onChange={this._inputChange} value={this.props.parameters.maxstepValue} step="0.001" min="0" max={this.props.maxstepMax}/>
+							<InputNumber className="table_input maxStep" type="number" name="maxstepValue" onChange={this._inputChange} value={this.props.parameters.maxstepValue} step="any" min={this.props.taskDependent.stepMin} max={this.props.taskDependent.stepMax}/>
 						</div>
 						<div className="table_row">
 							<label className="table_label">Допустимая ошибка</label>
-							<InputNumber className="table_input errorTolerance" name="errorValue" onChange={this._inputChange} type="number" value={this.props.parameters.errorValue} step="any" min="0" max={this.props.errorMax}/>
+							<InputNumber className="table_input errorTolerance" name="errorValue" onChange={this._inputChange} type="number" value={this.props.parameters.errorValue} step="any" min="0" max='NaN'/>
 						</div>
 					</div>
 					<div className="table_row_group chooseOrder" style={(!options.chooseOrderEnabled)?{display:'none'}:{}}>
@@ -102,20 +102,14 @@ class MethodParameters extends React.Component
 							<label className="table_label">Порядок метода</label>
 							<select className="table_input Orders" name="selectedOrder" onChange={this._inputChange} value={this.props.parameters.selectedOrder}>
 									{orderRows}
-								{/*	
-									for(var i=this.props.minOrder;i<this.props.maxOrder;i++)
-									{
-										<option>{i}</option>
-									}*/
-								}
 							</select>
 						</div>
 					</div>
 					<div className="table_row_group useJacobian" style={(!options.jacobianMatrixEnabled)?{display:'none'}:{}}>
 						<div className="table_row jacobiMatrixEval">
 							<label className="table_label">Матрица Якоби</label>
-							<select className="table_input jacobianCalc" name="jacobianSelected" onChange={this._inputChange} value={this.props.jacobianAnalythicEnabled?this.props.parameters.jacobianSelected:1}>
-								<option value='0' disabled={!this.props.jacobianAnalythicEnabled} >
+							<select className="table_input jacobianCalc" name="jacobianSelected" onChange={this._inputChange} value={this.props.taskDependent.jacobianAnalythicEnabled?this.props.parameters.jacobianSelected:1}>
+								<option value='0' disabled={!this.props.taskDependent.jacobianAnalythicEnabled} >
 									Аналитическая
 								</option>
 								<option value='1'>
@@ -125,7 +119,7 @@ class MethodParameters extends React.Component
 						</div>
 						<div className="table_row">
 							<label className="table_label">Константная матрица</label>
-							<InputNumber type="checkbox" className="table_input jacobianConst" name="useConstMatrix" onChange={this._inputChange} checked={this.props.parameters.useConstMatrix}/>
+							<input type="checkbox" className="table_input jacobianConst" name="useConstMatrix" onChange={this._inputChange} checked={this.props.parameters.useConstMatrix}/>
 						</div>
 					</div>
 				</div>

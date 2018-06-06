@@ -78,6 +78,7 @@ var chemistry={
     {
         name:"t",
         description:"Начальное время",
+        plotDescription:'Время',
         default:0,
         step:1,
         min:0,
@@ -191,7 +192,13 @@ var chemistry={
         <div style='margin:0px 40px 20px;'><img src='./img/chemistryFormulas16px.png'></div>
         <div>где x<sub>i</sub> - концентрация i-го реагента</div>`
     },
-
+    methodsAttributes:
+    {
+        stepValue:10,
+        stepMin:10e-1,
+        stepMax:500,
+        jacobianAnalythicEnabled:false
+    },
     getFunctions:function getFunctions(parameters)
     {
         var functions=new Array(8);

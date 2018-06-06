@@ -58,6 +58,7 @@ class TaskParametersStore extends EventEmitter
 				break;
 			case SESSIONS_ACTIONS.NEW_SESSION:
 			case SESSIONS_ACTIONS.LOAD_SESSION:
+			case SESSIONS_ACTIONS.LOAD_FILE:
 				Dispatcher.waitFor([sessionsStore.dispatchToken]);
 				this.data=sessionsStore.getCurrentSessions();
 				//this.selectedTask=0;

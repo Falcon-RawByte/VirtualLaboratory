@@ -80,7 +80,8 @@ class Output extends React.Component
 		this.setState({progress:progress});
 	}
 	render(){
-		let inner=[];
+		let statistics=[];
+		let plots=[];
 		if(this.state.data!==undefined)
 		{
 			self=this;
@@ -89,17 +90,19 @@ class Output extends React.Component
 			let output=this.state.data;
 			output.statistics.forEach(function(el,index)
 			{
-				inner.push(<div key={index+"_stat"} style={{color:colors[output.methods[index].color]}}>{(index+1)+". "+Methods[output.methods[index].name].attributes.name}</div>);
+				statistics.push(<div key={index+"_stat"} style={{color:colors[output.methods[index].color]}}>{(index+1)+". "+Methods[output.methods[index].name].attributes.name}</div>);
 				if(el.localError!=undefined)
 				{	
-					inner.push(<div key={index+"_stat_avlocerr"} style={{marginLeft:'40px'}}>{"Средняя локальная ошибка: "+el.localError}</div>);
-					inner.push(<div key={index+"_stat_avgloberr"} style={{marginLeft:'40px'}}>{"Средняя глобальная ошибка: "+el.globalError}</div>);
-					inner.push(<div key={index+"_stat_maxlocerr"} style={{marginLeft:'40px'}}>{"Максимальная локальная ошибка: "+el.maxLocalError}</div>);
-					inner.push(<div key={index+"_stat_maxgloberr"} style={{marginLeft:'40px'}}>{"Максимальная глобальная ошибка: "+el.maxGlobalError}</div>);
-					inner.push(<div key={index+"_stat_finalgloberr"} style={{marginLeft:'40px'}}>{"Конечная глобальная ошибка: "+el.finalGlobalError}</div>);
+					statistics.push(<div key={index+"_stat_avlocerr"} style={{marginLeft:'40px'}}>{"Средняя локальная ошибка: "+el.localError.toPrecision(3)}</div>);
+					statistics.push(<div key={index+"_stat_avgloberr"} style={{marginLeft:'40px'}}>{"Средняя глобальная ошибка: "+el.globalError.toPrecision(3)}</div>);
+					statistics.push(<div key={index+"_stat_maxlocerr"} style={{marginLeft:'40px'}}>{"Максимальная локальная ошибка: "+el.maxLocalError.toPrecision(3)}</div>);
+					statistics.push(<div key={index+"_stat_maxgloberr"} style={{marginLeft:'40px'}}>{"Максимальная глобальная ошибка: "+el.maxGlobalError.toPrecision(3)}</div>);
+					statistics.push(<div key={index+"_stat_finalgloberr"} style={{marginLeft:'40px'}}>{"Конечная глобальная ошибка: "+el.finalGlobalError.toPrecision(3)}</div>);
 				}
-				inner.push(<div key={index+"_stat_calc"} style={{marginLeft:'40px'}}>{"Количество вычислений правой части: "+el.calculations}</div>);
-				inner.push(<div key={index+"_stat_step"} style={{marginLeft:'40px'}}>{"Средний шаг: "+el.averageStep}</div>);
+				statistics.push(<div key={index+"_stat_calc"} style={{marginLeft:'40px'}}>{"Количество вычислений элементов правой части: "+el.calculations}</div>);
+				statistics.push(<div key={index+"_stat_step"} style={{marginLeft:'40px'}}>{"Средний шаг E-3: "+(el.averageStep*1000).toPrecision(3)}</div>);
+				statistics.push(<div key={index+"_stat_jacobi"} style={{marginLeft:'40px'}}>{"Количество вычислений элементов матрицы Якоби: "+el.jacobianCalculations}</div>);
+				statistics.push(<div key={index+"_stat_matrix"} style={{marginLeft:'40px'}}>{"Количество решений СЛАУ: "+el.matrixSolving}</div>);
 			});
 			if(output.localErrorPlots.length>0)
 			{
@@ -110,32 +113,32 @@ class Output extends React.Component
 						localTraces.push({x:output.timeArrays[output.errorIndicies[index]],
 							y:el,
 							line:{color:colors[output.methods[index].color]},
-							name:Methods[output.methods[output.errorIndicies[index]].name].attributes.name
+							name:(output.errorIndicies[index]+1)+". "+Methods[output.methods[output.errorIndicies[index]].name].attributes.name
 						});
 						globalTraces.push({x:output.timeArrays[output.errorIndicies[index]],
 							y:output.globalErrorPlots[index],
 							line:{color:colors[output.methods[index].color]},
-							name:Methods[output.methods[output.errorIndicies[index]].name].attributes.name
+							name:(output.errorIndicies[index]+1)+". "+Methods[output.methods[output.errorIndicies[index]].name].attributes.name
 						});
 					});
-				inner.push(<Plot key="localErrorPlot" data={localTraces} 
+				plots.push(<div key="localErrorPlot"><Plot key="localErrorPlot" data={localTraces} 
 					layout={
 						{
 							showlegend:true,
 							title:'Графики локальной ошибки',
-							xaxis:{title:this.state.task.argument.name},
-							yaxis:{title:'Local error'}
+							xaxis:{title:this.state.task.argument.plotDescription},
+							yaxis:{title:'Локальная ошибка'}
 						}
-					}/>);
-				inner.push(<Plot key="globalErrorPlot" data={globalTraces} 
+					}/></div>);
+				plots.push(<div key="globalErrorPlot"><Plot key="globalErrorPlot" data={globalTraces} 
 					layout={
 						{
 							showlegend:true,
 							title:'Графики глобальной ошибки',
-							xaxis:{title:this.state.task.argument.name},
-							yaxis:{title:'Global error'}
+							xaxis:{title:this.state.task.argument.plotDescription},
+							yaxis:{title:'Глобальная ошибка'}
 						}
-					}/>);
+					}/></div>);
 			}
 			if(output.eigenvaluePlots.length>0)
 			{
@@ -145,20 +148,20 @@ class Output extends React.Component
 						traces.push({x:output.timeArrays[index],
 							y:el,
 							line:{color:colors[output.methods[index].color]},
-							name:Methods[output.methods[index].name].attributes.name
+							name:(index+1)+". "+Methods[output.methods[index].name].attributes.name
 						});
 					});
-				inner.push(<Plot key="eigenvaluePlot"
+				plots.push(<div key="diveigenvaluePlot"><Plot key="eigenvaluePlot"
 						data={traces}
 						layout={
 							{
 								showlegend:true,
 								title:'Графики максимальных по модулю собственных чисел',
 								xaxis:{title:this.state.task.argument.name},
-								yaxis:{title:'lambda'}
+								yaxis:{title:'\u033bb'}
 							}
 						}
-					/>);
+					/></div>);
 			}
 			if(output.plots.length>0)
 			{
@@ -175,7 +178,7 @@ class Output extends React.Component
 							data.z=elem.z;
 							data.type='scatter3d';
 						}
-						data.name=Methods[output.methods[ind].name].attributes.name;
+						data.name=(ind+1)+". "+Methods[output.methods[ind].name].attributes.name;
 						data.mode= 'lines+points';
 						data.line={color:colors[output.methods[ind].color]};
 						traces.push(data);
@@ -189,10 +192,10 @@ class Output extends React.Component
 						let z=self.state.task.plotInfo[el.index].z;
 						if(z!==undefined)
 							layout.zaxis={title:z.description};
-					inner.push(<Plot key={index+"_plot"}
+					plots.push(<div  key={index+"div_plot"}><Plot  key={index+"_plot"}
 						data={traces}
 						layout={layout}
-						/>);
+						/></div>);
 				});
 			}
 		}
@@ -200,13 +203,21 @@ class Output extends React.Component
 			<div id="outputBlock">
 			<progress id="progressBar" style={{width:'100%'}} value={this.state.progress} max="100"></progress>
 			<div style={{textAlign:'center'}}>
-			<button className="btn btn-dark startButton" onClick={this._calculate}>Рассчитать</button>
+			<button id="outputCalculateButton" className="btn btn-primary startButton" onClick={this._calculate}>Рассчитать</button>
 			</div>
-			<div id="output">
-				<div>Вывод результатов</div>
-				<div ref={node => this.resultNode = node}>
-					{inner}
+			<div id="output" ref={node => this.resultNode = node} style={this.state.data==undefined?{display:'none'}:{}}>
+				<div id="outputResultsLabel" className="componentLabel">Вывод результатов</div>
+				<div id="ouputInnerBlock">
+					{statistics}
 				</div>
+				<div id='outputGraphLabel' className="componentLabel" style={plots.length>0?{}:{display:'none'}}>
+				Графики
+				</div>
+				<div id="ouputInnerPlotBlock" style={plots.length>0?{}:{display:'none'}} >
+					{plots}
+				</div>
+			</div>
+			<div id="outputFooter">
 			</div>
 			</div>
 			);

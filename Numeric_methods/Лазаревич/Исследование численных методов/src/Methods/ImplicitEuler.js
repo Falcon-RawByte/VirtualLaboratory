@@ -41,7 +41,7 @@ class ImplicitEuler
 		var t_next=data.t+this.step;
 		var y_old=data.xv.slice();
 		var k=0;
-		var last_f_difference=Number.MAX_VALUE;
+		var last_f_difference=0;
 		if(this.jacobianConst==true)
 		{
 			for(var j=0;j<count;j++)
@@ -139,7 +139,7 @@ class ImplicitEuler
 		var y_old=data.xv.slice();
 		var jacobianStep=0.001;
 		var k=0;
-		var last_f_difference=Number.MAX_VALUE;
+		var last_f_difference=0;
 		if(this.jacobianConst==true)
 		{
 			for(var j=0;j<count;j++)
@@ -148,7 +148,7 @@ class ImplicitEuler
 				{//df=y+jstep-h*f(t,y+jstep)-y+h*f(t,y)
 					var y_temp=y[i];
 					var df=(-this.funcs[j](y,t_next));
-					y[i]+=this.jacobianStep;
+					y[i]+=jacobianStep;
 					df=(-this.funcs[j](y,t_next)-df);
 					df*=this.step;
 					df/=jacobianStep;

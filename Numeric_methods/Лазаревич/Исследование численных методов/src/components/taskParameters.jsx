@@ -87,11 +87,11 @@ class TaskParameters extends React.Component
 					{variables}
 					<div className="table_row">
 					<label className="table_label">{data.argument.description}</label>
-					<InputNumber className="table_input" onChange={this._updateArgument} type="number" name="argument" id="argument" value={this.state.data.argument} step={data.argument.name.step} min={data.argument.name.min} max={data.argument.name.max}/>
+					<InputNumber className="table_input" onChange={this._updateArgument} type="number" name="argument" id="argument" value={this.state.data.argument} step={data.argument.step} min={data.argument.min} max={data.argument.max}/>
 					</div>
 					<div className="table_row">
 					<label className="table_label">{data.argumentInterval.description}</label>
-					<InputNumber className="table_input" onChange={this._updateArgument} type="number" name="argumentInterval" id="argumentInterval" value={this.state.data.argumentInterval} step={data.argument.name.step} min={data.argument.name.min} max={data.argument.name.max}/>
+					<InputNumber className="table_input" onChange={this._updateArgument} type="number" name="argumentInterval" id="argumentInterval" value={this.state.data.argumentInterval} step={data.argument.step} min={data.argument.min} max={data.argument.max}/>
 					</div>
 					</div>
 					</div>

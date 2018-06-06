@@ -58,6 +58,7 @@ var pendulumKapitza={
     {
         name:"t",
         description:"Начальное время",
+        plotDescription:'Время',
         default:0,
         step:'any',
         min:0,
@@ -122,9 +123,10 @@ var pendulumKapitza={
     },
     methodsAttributes:
     {
-        stepvalue:10,
-        stepmin:10e-1,
-        stepmax:500
+        stepValue:10,
+        stepMin:10e-1,
+        stepMax:500,
+        jacobianAnalythicEnabled:true
     },
     getJacobian:function getJacobian(parameters)
     {

@@ -3,6 +3,7 @@ import MethodPickerListItem from "./methodPickerListItem.jsx";
 import MethodParameters from "./methodParameters.jsx";
 import {colors,defaultParameters, methodPickerStore,Methods} from "../stores/methodPickerStore.js";
 import {methodPickerActions} from "../actions/methodPickerActions.js";
+import {taskParametersStore} from "../stores/taskParametersStore";
 
 
 
@@ -21,13 +22,14 @@ class MethodPicker extends React.Component
 			[
 				/*{methodParameters:{methodId:0,methodNumber:0},colorId:0},
 				{methodParameters:{methodId:1,methodNumber:1},colorId:1}*/
-			]}
+			],dependOnTask:{}};
 		    //colorPallete:["#E600CE","#0014AF","$00C13A","#F6D444"],//violet blue green yellow
 			//methodList:["method one","method two"]};
 	}
 	getMethods()
 	{
-		this.setState({methods:methodPickerStore.getMethods(),selectedId:methodPickerStore.getSelectedMethod()});
+		this.setState({methods:methodPickerStore.getMethods(),selectedId:methodPickerStore.getSelectedMethod(),
+			dependOnTask:methodPickerStore.getParameters()});
 	}
 	componentWillMount()
 	{
@@ -90,7 +92,7 @@ class MethodPicker extends React.Component
 					</button>
 					{items}
 				</div>
-				<MethodParameters onUpdate={self._methodUpdate} parameters={this.state.selectedId==-1?defaultParameters:this.state.methods[this.state.selectedId].parameters} show={this.state.selectedId!=-1}/>
+				<MethodParameters onUpdate={self._methodUpdate} taskDependent={this.state.dependOnTask} parameters={this.state.selectedId==-1?defaultParameters:this.state.methods[this.state.selectedId].parameters} show={this.state.selectedId!=-1}/>
 			</div>
 			</div>
 			);

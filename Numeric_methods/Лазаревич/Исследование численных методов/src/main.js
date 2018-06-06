@@ -7,6 +7,7 @@ import TaskParameters from "./components/taskParameters.jsx";
 import TaskBlock from "./components/taskBlock.jsx";
 import OutputParameters from "./components/outputParameters.jsx";
 import Output from "./components/output.jsx";
+import Help from "./components/help.jsx";
 import {taskParametersStore} from "./stores/taskParametersStore.js";
 import {outputParametersStore} from "./stores/outputParametersStore.js";
 import {methodPickerStore} from "./stores/methodPickerStore.js";
@@ -28,9 +29,12 @@ class App extends React.Component
 	}
 	render()
 	{
-
 		return (
 			<div>
+			<Help />
+			<div id="applicationTitle" className="display-3 noSelect">
+			Сравнение методов решения систем ОДУ
+			</div>
 			<SessionsList />
 			<TaskBlock />
 			<TaskParameters />

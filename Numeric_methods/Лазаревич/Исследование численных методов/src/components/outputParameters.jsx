@@ -28,18 +28,22 @@ class OutputParameters extends React.Component
 		super(props);
 		this.getMethods=this.getMethods.bind(this);
 		this.getParameters=this.getParameters.bind(this);
-		this.state={parameters:outputParametersStore.getParameters(),methods:methodPickerStore.getMethodListNames()};
+		this.getTask=this.getTask.bind(this);
+		this._updateSlider=this._updateSlider.bind(this);
+		this.state={parameters:outputParametersStore.getParameters(),methods:methodPickerStore.getMethodListNames(),task:taskParametersStore.getSelectedTask()};
 	}
 	componentWillMount()
 	{
 		methodPickerStore.on("change",this.getMethods);
 		outputParametersStore.on("change",this.getParameters);
+		taskParametersStore.on("change",this.getTask);
 
 	}
 	componentWillUnmount()
 	{
 		methodPickerStore.removeListener("change",this.getMethods);
 		outputParametersStore.removeListener("change",this.getParameters);
+		taskParametersStore.removeListener("change",this.getTask);
 	}
 	getParameters()
 	{
@@ -48,6 +52,10 @@ class OutputParameters extends React.Component
 	getMethods()
 	{
 		this.setState({methods:methodPickerStore.getMethodListNames()});
+	}
+	getTask()
+	{
+		this.setState({task:taskParametersStore.getSelectedTask()});
 	}
 	componentDidMount()
 	{
@@ -75,12 +83,13 @@ class OutputParameters extends React.Component
 		this.state.parameters.plots.forEach(function(data,index)
 		{
 			checkboxes.push(<div className="table_row" key={index+"_plotDiv"}>
-				<label key={index+"_plotLabel"} className="table_label" htmlFor={index+"_input"}>{data.name}</label>
-				<input  className="table_input" type="checkbox" name={index} key={index+"_input"} id={index+"_input"} onChange={self._updatePlots} checked={data.value} />
+				<label key={index+"_plotLabel"} className="table_label" htmlFor={index+"_input"}>{self.state.task.plotInfo[index].description}</label>
+				<input  className="table_input" type="checkbox" name={index} key={index+"_input"} id={index+"_input"} onChange={self._updatePlots} checked={data} />
 					</div>);
 		});
 		let domain=[this.state.parameters.plotDomain.t0, this.state.parameters.plotDomain.t1], reversed=false;
 		let values=this.state.parameters.plotInterval;
+
 		let ticks=20;
 		let step=(domain[1]-domain[0])/ticks;
 		return (
@@ -109,11 +118,26 @@ class OutputParameters extends React.Component
 			 	</div>
 			 	<div>
 			 		<div className="componentLabel" id="outputPlotIntervalLabel">
-			 		Интервал построения графика
+			 		Интервал построения графиков
 			 		</div>
 				 	<div id="plotSlider" style={{padding:"20px "+50/ticks+"%",marginBottom:"20px"}}>
 					 	<Slider
-				          mode={1}
+				          mode={function(values,update,count,smthing)
+				          	{
+				          		if(values[0].val<update[0].val)
+				          		{
+				          			let u1=update[0].val+self.state.parameters.plotDomain.dt;
+				          			update[1].val=Math.min(Math.max(update[0].val,Math.floor(u1/step)*step)
+				          			,update[1].val);
+				          		}
+				          		else
+				          		{
+				          			let u1=update[1].val-self.state.parameters.plotDomain.dt;
+				          			update[0].val=Math.max(Math.min(update[1].val,Math.ceil(u1/step)*step)
+				          			,update[0].val);
+				          		}
+				          		return update;
+				          	}}
 				          step={step}
 				          domain={domain}
 				          reversed={reversed}

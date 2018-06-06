@@ -22,11 +22,7 @@ https://medium.com/capital-one-developers/how-to-work-with-forms-inputs-and-even
 
 export const dependOnTask=
 {
-	errorDefault:0.01,
-	errorMin:0.001,
 	errorMax:0.01,
-	maxstepMin:1000,
-	maxstepMax:1,
 	stepMin:1,
 	stepMax:1000,
 	jacobianAnalythicEnabled:false
@@ -65,11 +61,14 @@ class MethodPickerStore extends EventEmitter
 		this.colorPool=[0,1,2,3];
 		this.selectedMethod=-1;
 		this.selectedTask=tasks[0];
+		this.dependOnTask=dependOnTask;
+		this.defaultParameters=defaultParameters;
 	}
 	init()
 	{
 		this.methods=taskParametersStore.getTaskMethods();
 		this.selectedTask=taskParametersStore.getSelectedTask();
+		this.setParameters();
 	}
 	selectMethod(id)
 	{
@@ -77,6 +76,28 @@ class MethodPickerStore extends EventEmitter
 		{
 			this.selectedMethod=(id>this.methods.length ? -1 : id);
 			this.emit("change");
+		}
+	}
+	setParameters()
+	{
+		this.dependOnTask=Object.assign({},dependOnTask);
+		this.defaultParameters=Object.assign({},defaultParameters);
+		let mA=this.selectedTask.methodsAttributes;
+		if(mA!==undefined)
+		{
+			for(var propertyName in this.dependOnTask) {
+				if(mA[propertyName]!==undefined)
+				{
+					this.dependOnTask[propertyName]=mA[propertyName];
+				}
+			}
+
+			for(var propertyName in this.defaultParameters) {
+				if(mA[propertyName]!==undefined)
+				{
+					this.defaultParameters[propertyName]=mA[propertyName];
+				}
+			}
 		}
 	}
 	handleActions(action)
@@ -97,9 +118,11 @@ class MethodPickerStore extends EventEmitter
 					break;
 				case SESSIONS_ACTIONS.NEW_SESSION:
 				case SESSIONS_ACTIONS.LOAD_SESSION:
+				case SESSIONS_ACTIONS.LOAD_FILE:
 					Dispatcher.waitFor([sessionsStore.dispatchToken,taskParametersStore.dispatchToken]);
 					this.methods=taskParametersStore.getTaskMethods();
 					this.selectedTask=taskParametersStore.getSelectedTask();
+					this.seParameters();
 					this.selectedMethod=-1;
 					this.emit("change");
 					break;
@@ -107,6 +130,7 @@ class MethodPickerStore extends EventEmitter
 					Dispatcher.waitFor([taskParametersStore.dispatchToken]);
 					this.methods=taskParametersStore.getTaskMethods();
 					this.selectedTask=taskParametersStore.getSelectedTask();
+					this.setParameters();
 					this.selectedMethod=-1;
 					this.emit("change");
 					break;
@@ -117,7 +141,7 @@ class MethodPickerStore extends EventEmitter
 		if(this.methods.length==4)
 			return;
 		//var id=this.colorPool.pop();
-		this.methods.push({colorId:0,parameters:Object.assign({}, defaultParameters)});
+		this.methods.push({colorId:0,parameters:Object.assign({}, this.defaultParameters)});
 		this.emit("change");
 	}
 	removeMethodListItem(id)
@@ -143,6 +167,10 @@ class MethodPickerStore extends EventEmitter
 	{
 		this.methods[id].parameters[name]=value;
 		this.emit("change");
+	}
+	getParameters()
+	{
+		return this.dependOnTask;
 	}
 	getSelectedMethod()
 	{

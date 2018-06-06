@@ -9,7 +9,10 @@ class SessionsStore extends EventEmitter
 	constructor()
 	{
 		super();
-		this.sessions=this.loadSessions();
+		this.sessions==new Array(tasks.length);
+		this.sessions=tasks.map(function(el,index){
+			return {taskID:el.taskID,sessionArray:[]};
+		});
 		this.currentSessions=[];
 		this.initSessions();
 		this.dispatchToken=Dispatcher.register(this.handleActions.bind(this));
@@ -45,6 +48,11 @@ class SessionsStore extends EventEmitter
 				}
 			case SESSIONS_ACTIONS.UPDATE_SESSION:
 				break;
+			case SESSIONS_ACTIONS.LOAD_FILE:
+				{
+					this.loadSessions(action.content);
+					break;
+				}
 		}
 	}
 	getSessions()
@@ -63,7 +71,118 @@ class SessionsStore extends EventEmitter
 		}
 		//save all sessions to local storage
 	}
-	loadSessions()
+	loadSessions(fileInput)
+	{
+		var sessions=[];
+		sessions=tasks.map(function(el,index){
+			return {taskID:el.taskID,sessionArray:[]};
+		});
+		try{
+			let data=JSON.parse(fileInput);
+			data.forEach(function(el,index)
+			{
+				let flag=false;
+				for(var i=0;i<tasks.length;i++)
+				{
+					if(el.taskID==tasks[i].taskID)
+					{
+						sessions[i].sessionArray=sessions[i].sessionArray.concat(el.sessionArray);
+						break;
+					}else
+					{
+						sessions.push(el);
+					}
+				}
+			});
+			sessions.forEach(function(el,index)
+				{
+					let len=el.sessionArray.length;
+					if(len>8)
+						el.sessionArray.splice(8,len-8);
+				});
+		}catch(e)
+		{
+			//error
+			alert("Error");
+			return;
+		}
+		this.sessions=sessions;
+		for(var i=0;i<tasks.length;i++)
+		{
+			this.newSession(i);
+		}
+		this.emit("change");
+		return;
+	}
+	removeSession(id,taskID)
+	{
+		this.sessions[taskID].sessionArray.splice(id,1);
+		this.emit("change");
+	}
+	initSessions()
+	{
+		this.currentSessions=new Array(tasks.length);
+		for(var i=0;i<tasks.length;i++)
+		{
+			this.newSession(i);
+		}
+	}
+	newSession(taskID)
+	{
+
+		let session={sessionName:'Новая сессия'};
+		let data={};
+		let i=taskID;
+		let k=0;
+		let taskParameters={};
+		taskParameters.argument=tasks[i].argument.default;
+		taskParameters.argumentInterval=tasks[i].argumentInterval.default;
+		taskParameters.parameters=tasks[i].parameters.map(function(data)
+		{
+			return data.default;
+		});
+		taskParameters.variables=tasks[i].variables.map(function(data)
+		{
+			return data.default;
+		});
+		let outputParameters={};
+		outputParameters.errorMethod=-1;
+		outputParameters.plotInterval=[0, 0];
+		outputParameters.plotDomain={t0:0,t1:1,dt:0};
+		outputParameters.errorPlot=false;
+		outputParameters.eigenvaluePlot=false;
+		outputParameters.plots=[
+		];
+		tasks[i].plotInfo.forEach(function(data)
+		{
+			outputParameters.plots.push(false)
+		});
+		data={methods:[],taskParameters:taskParameters,outputParameters:outputParameters};
+		session.data=data;
+		this.currentSessions[taskID]=session;
+		this.emit("change");
+	}
+	saveCurrentSession(sessionName,taskID)
+	{
+		if(this.sessions[taskID].sessionArray.length<8)
+		{
+			this.currentSessions[taskID].sessionName=sessionName;
+			this.sessions[taskID].sessionArray.push(JSON.parse(JSON.stringify(this.currentSessions[taskID])));
+			this.emit("change");
+		}
+	}
+	loadSession(id,taskID)
+	{
+		//this.currentSession=Object.assign({},this.sessions[id]);
+		this.currentSessions[taskID]=JSON.parse(JSON.stringify(this.sessions[taskID].sessionArray[id]));//what a shame, object assign cannot create deep copy
+		this.emit("change");
+	}
+}
+
+export const sessionsStore=new SessionsStore();
+
+
+let unused=`loadSessions()
 	{
 		/*
 		sessions:
@@ -148,70 +267,4 @@ class SessionsStore extends EventEmitter
 		]
 		+ addNewSession
 		*/
-	}
-	removeSession(id,taskID)
-	{
-		this.sessions[taskID].sessionArray.splice(id,1);
-		this.emit("change");
-	}
-	initSessions()
-	{
-		this.currentSessions=new Array(tasks.length);
-		for(var i=0;i<tasks.length;i++)
-		{
-			this.newSession(i);
-		}
-	}
-	newSession(taskID)
-	{
-
-		let session={sessionName:'Новая сессия'};
-		let data={};
-		let i=taskID;
-		let k=0;
-		let taskParameters={};
-		taskParameters.argument=tasks[i].argument.default;
-		taskParameters.argumentInterval=tasks[i].argumentInterval.default;
-		taskParameters.parameters=tasks[i].parameters.map(function(data)
-		{
-			return data.default;
-		});
-		taskParameters.variables=tasks[i].variables.map(function(data)
-		{
-			return data.default;
-		});
-		let outputParameters={};
-		outputParameters.errorMethod=-1;
-		outputParameters.plotInterval=[0, 0];
-		outputParameters.plotDomain={t0:0,t1:1,dt:0};
-		outputParameters.errorPlot=false;
-		outputParameters.eigenvaluePlot=false;
-		outputParameters.plots=[
-		];
-		tasks[i].plotInfo.forEach(function(data)
-		{
-			outputParameters.plots.push({value:false,name:data.description})
-		});
-		data={methods:[],taskParameters:taskParameters,outputParameters:outputParameters};
-		session.data=data;
-		this.currentSessions[taskID]=session;
-		this.emit("change");
-	}
-	saveCurrentSession(sessionName,taskID)
-	{
-		if(this.sessions[taskID].sessionArray.length<8)
-		{
-			this.currentSessions[taskID].sessionName=sessionName;
-			this.sessions[taskID].sessionArray.push(JSON.parse(JSON.stringify(this.currentSessions[taskID])));
-			this.emit("change");
-		}
-	}
-	loadSession(id,taskID)
-	{
-		//this.currentSession=Object.assign({},this.sessions[id]);
-		this.currentSessions[taskID]=JSON.parse(JSON.stringify(this.sessions[taskID].sessionArray[id]));//what a shame, object assign cannot create deep copy
-		this.emit("change");
-	}
-}
-
-export const sessionsStore=new SessionsStore();
+	}`
