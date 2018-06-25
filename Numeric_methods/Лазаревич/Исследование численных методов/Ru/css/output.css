@@ -1,0 +1,41 @@
+
+
+#outputBlock
+{
+	margin:0px 0.2%;
+
+}
+
+.startButton
+{
+	margin-top:3px;
+	margin-bottom:3px;
+}
+#output
+{
+	border:2px solid black;
+}
+
+.startButton
+{
+	margin:5px 0px;
+}
+#ouputInnerBlock,#ouputInnerPlotBlock
+{
+	padding:5px;
+}
+#outputInnerPlotBlock
+{
+	text-align:center;
+}
+#outputResultsLabel
+{
+	padding:5px;
+	border-bottom:2px solid black;
+}
+#outputGraphLabel
+{
+	padding:5px;
+	border-bottom:2px solid black;
+	border-top:2px solid black;
+}

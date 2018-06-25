@@ -1,0 +1,84 @@
+.presetButtonContainer
+{
+	margin-top:auto;
+	display:flex;
+	flex-direction:column;
+}
+#PresetList
+{
+	overflow-y:auto;
+	white-space: nowrap;
+	margin:5px -5px 0px -5px;
+	display:flex;
+	flex-direction: row;
+}
+
+
+.presetMethod
+{
+	position:relative;
+	display:flex;
+	word-break:break-all;
+}
+
+.presetMethodPreviewParameters
+{
+	display:flex;
+	flex-direction: column;
+}
+
+.presetMethodName
+{
+	/*width:100px;*/
+	display:inline-block;
+}
+
+.presetButton
+{
+	margin-top:3px;
+	margin-bottom:3px;
+}
+
+
+#presetsBlock
+{
+	background-color:#00C13A;
+	display:flex;
+	flex-direction:row;
+}
+
+.presetBlock
+{
+	border:1px solid black;
+	display:flex;
+	flex-direction:column;
+	padding:5px;
+	margin:10px;
+	width:250px;
+}
+
+.sessionCreationBlock
+{
+	padding:5px;
+}
+
+#sessionBlock
+{
+	margin:5px 0.2% 0px 0.2%;
+}
+
+#sessionBlockLabel
+{
+	border-top:2px solid black;
+	border-left:2px solid black;
+	border-right:2px solid black;
+	padding:5px;
+}
+
+#sessionListBlock
+{
+	background-color:white;
+	display:flex;
+	flex-direction:row;
+	border:2px solid black;
+}
